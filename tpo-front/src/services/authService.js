@@ -1,34 +1,33 @@
 import api from './api';
 
-// Storage keys
 const STORAGE_KEYS = {
   TOKEN: 'access_token',
-  USER: 'marketplace_user',
-  REFRESH_TOKEN: 'refresh_token'
+  USER: 'marketplace_user'
 };
 
 const authService = {
-  // Authentication methods
   login: async (credentials) => {
     try {
-      // Transform email to username for backend compatibility
       const loginData = {
         username: credentials.email,
         password: credentials.password
       };
 
       const response = await api.post('/user/authenticate', loginData);
-      const { token, user, refreshToken } = response.data;
+      const { access_token, user } = response.data;
 
-      // Store tokens and user data
-      if (token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-      }
-      if (refreshToken) {
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      if (access_token) {
+        localStorage.setItem(STORAGE_KEYS.TOKEN, access_token);
       }
       if (user) {
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        const userData = {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          lastName: user.lastName,
+          role: user.role || 'COMPRADOR'
+        };
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
       }
 
       return response.data;
@@ -40,17 +39,20 @@ const authService = {
   register: async (userData) => {
     try {
       const response = await api.post('/user/register', userData);
-      const { token, user, refreshToken } = response.data;
+      const { access_token, user } = response.data;
 
-      // Store tokens and user data
-      if (token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-      }
-      if (refreshToken) {
-        localStorage.setItem(STORAGE_KEYS.REFRESH_TOKEN, refreshToken);
+      if (access_token) {
+        localStorage.setItem(STORAGE_KEYS.TOKEN, access_token);
       }
       if (user) {
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
+        const userDataToStore = {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          lastName: user.lastName,
+          role: user.role || userData.role || 'COMPRADOR'
+        };
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userDataToStore));
       }
 
       return response.data;
@@ -61,79 +63,60 @@ const authService = {
 
   logout: async () => {
     try {
-      // Optional: Call logout endpoint to invalidate token on server
       const token = authService.getToken();
       if (token) {
         await api.post('/user/logout');
       }
     } catch (error) {
-      console.warn('Logout endpoint failed:', error);
+      // Ignore logout errors
     } finally {
-      // Always clear local storage
       authService.clearStorage();
     }
   },
 
-  // Token management
-  getToken: () => {
-    return localStorage.getItem(STORAGE_KEYS.TOKEN);
-  },
+  getToken: () => localStorage.getItem(STORAGE_KEYS.TOKEN),
 
-  getRefreshToken: () => {
-    return localStorage.getItem(STORAGE_KEYS.REFRESH_TOKEN);
-  },
-
-  refreshToken: async () => {
-    try {
-      const refreshToken = authService.getRefreshToken();
-      if (!refreshToken) {
-        throw new Error('No refresh token available');
-      }
-
-      const response = await api.post('/user/refresh', { refreshToken });
-      const { token, user } = response.data;
-
-      if (token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, token);
-      }
-      if (user) {
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(user));
-      }
-
-      return response.data;
-    } catch (error) {
-      authService.clearStorage();
-      throw authService._handleError(error);
-    }
-  },
-
-  // User data management
   getCurrentUser: () => {
     try {
-      const user = localStorage.getItem(STORAGE_KEYS.USER);
-      return user ? JSON.parse(user) : null;
+      const userStr = localStorage.getItem(STORAGE_KEYS.USER);
+      if (!userStr) return null;
+      
+      const user = JSON.parse(userStr);
+      if (user && user.id && user.email) {
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name || '',
+          lastName: user.lastName || '',
+          role: user.role || 'COMPRADOR'
+        };
+      }
+      return null;
     } catch (error) {
-      console.error('Error parsing user data:', error);
-      localStorage.removeItem(STORAGE_KEYS.USER);
       return null;
     }
   },
 
   updateUser: (userData) => {
     try {
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      const userToStore = {
+        id: userData.id,
+        email: userData.email,
+        name: userData.name,
+        lastName: userData.lastName,
+        role: userData.role || 'COMPRADOR'
+      };
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userToStore));
       return true;
     } catch (error) {
-      console.error('Error updating user data:', error);
       return false;
     }
   },
 
-  // Utility methods
   isAuthenticated: () => {
-    const token = authService.getToken();
     const user = authService.getCurrentUser();
-    return !!(token && user);
+    const token = authService.getToken();
+    return !!(user && (token || user.id));
   },
 
   getUserRole: () => {
@@ -150,7 +133,6 @@ const authService = {
     const userRole = authService.getUserRole();
     if (!userRole || !requiredRole) return false;
     
-    // Define role hierarchy
     const roleHierarchy = {
       'ADMIN': 3,
       'VENDEDOR': 2,
@@ -166,35 +148,22 @@ const authService = {
     });
   },
 
-  // Private helper methods
   _handleError: (error) => {
     if (error.response) {
-      // Server responded with error status
       const { status, data } = error.response;
-      
-      switch (status) {
-        case 400:
-          return new Error(data.message || 'Datos inválidos');
-        case 401:
-          return new Error('Credenciales inválidas');
-        case 403:
-          return new Error('No tienes permisos para realizar esta acción');
-        case 404:
-          return new Error('Servicio no encontrado');
-        case 409:
-          return new Error(data.message || 'El usuario ya existe');
-        case 422:
-          return new Error(data.message || 'Datos de entrada inválidos');
-        case 500:
-          return new Error('Error interno del servidor');
-        default:
-          return new Error(data.message || `Error ${status}`);
-      }
+      const messages = {
+        400: 'Datos inválidos',
+        401: 'Credenciales inválidas',
+        403: 'No tienes permisos para realizar esta acción',
+        404: 'Servicio no encontrado',
+        409: 'El usuario ya existe',
+        422: 'Datos de entrada inválidos',
+        500: 'Error interno del servidor'
+      };
+      return new Error(data.message || messages[status] || `Error ${status}`);
     } else if (error.request) {
-      // Network error
       return new Error('No se pudo conectar al servidor. Verifica tu conexión.');
     } else {
-      // Other error
       return new Error(error.message || 'Error inesperado');
     }
   }

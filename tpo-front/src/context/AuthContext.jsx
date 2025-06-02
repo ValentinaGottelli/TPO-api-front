@@ -7,8 +7,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  // Initialize auth state on app start
+  
   useEffect(() => {
     initializeAuth();
   }, []);
@@ -17,17 +16,21 @@ export function AuthProvider({ children }) {
     try {
       setLoading(true);
       
-      // Check if user is already authenticated
-      if (authService.isAuthenticated()) {
-        const currentUser = authService.getCurrentUser();
+      const isAuth = authService.isAuthenticated();
+      const currentUser = authService.getCurrentUser();
+      
+      if (isAuth && currentUser) {
         setUser(currentUser);
         setIsAuthenticated(true);
-        
-        // Optionally verify token with server
-        // await verifyToken();
+      } else if (currentUser && currentUser.id) {
+        setUser(currentUser);
+        setIsAuthenticated(true);
+      } else {
+        setUser(null);
+        setIsAuthenticated(false);
+        authService.clearStorage();
       }
     } catch (error) {
-      console.error('Auth initialization failed:', error);
       await handleLogout();
     } finally {
       setLoading(false);
@@ -46,7 +49,6 @@ export function AuthProvider({ children }) {
       
       return { success: true, data: userData };
     } catch (error) {
-      console.error('Login failed:', error);
       return { success: false, error: error.message };
     } finally {
       setLoading(false);
@@ -65,7 +67,6 @@ export function AuthProvider({ children }) {
       
       return { success: true, data: newUser };
     } catch (error) {
-      console.error('Registration failed:', error);
       return { success: false, error: error.message };
     } finally {
       setLoading(false);
@@ -77,11 +78,15 @@ export function AuthProvider({ children }) {
       setLoading(true);
       await authService.logout();
     } catch (error) {
-      console.error('Logout failed:', error);
+      // Ignore logout errors
     } finally {
       setUser(null);
       setIsAuthenticated(false);
       setLoading(false);
+      
+      if (typeof window !== 'undefined') {
+        window.location.href = '/auth';
+      }
     }
   };
 
@@ -91,49 +96,45 @@ export function AuthProvider({ children }) {
       authService.updateUser(newUserData);
       return true;
     } catch (error) {
-      console.error('Failed to update user data:', error);
       return false;
     }
   };
 
-  const refreshAuthToken = async () => {
-    try {
-      const response = await authService.refreshToken();
-      const userData = response.user || response;
-      setUser(userData);
-      return { success: true, data: userData };
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      await handleLogout();
-      return { success: false, error: error.message };
-    }
-  };
-
-  // Helper methods
   const hasRole = (requiredRole) => {
+    if (!user || !user.role) return false;
     return authService.hasRole(requiredRole);
   };
 
   const getUserRole = () => {
-    return authService.getUserRole();
+    return user?.role || authService.getUserRole();
+  };
+
+  const getRedirectPath = (userRole) => {
+    const role = userRole || user?.role;
+    
+    switch (role) {
+      case 'VENDEDOR':
+        return '/seller';
+      case 'COMPRADOR':
+        return '/dashboard';
+      case 'ADMIN':
+        return '/dashboard';
+      default:
+        return '/dashboard';
+    }
   };
 
   const contextValue = {
-    // State
     user,
     loading,
     isAuthenticated,
-    
-    // Actions
     login: handleLogin,
     register: handleRegister,
     logout: handleLogout,
     updateUser: updateUserData,
-    refreshToken: refreshAuthToken,
-    
-    // Utilities
     hasRole,
     getUserRole,
+    getRedirectPath,
   };
 
   return (
@@ -143,7 +144,6 @@ export function AuthProvider({ children }) {
   );
 }
 
-// Custom hook
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
@@ -157,7 +157,7 @@ export const withAuth = (WrappedComponent, requiredRole = null) => {
     const { isAuthenticated, hasRole, loading } = useAuth();
     
     if (loading) {
-      return <div>Loading...</div>; // Or your loading component
+      return <div>Loading...</div>;
     }
     
     if (!isAuthenticated) {

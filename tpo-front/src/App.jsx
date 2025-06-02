@@ -1,8 +1,10 @@
+import React, { useState } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import Login from './components/auth/Login';
 import Register from './components/auth/Register';
-import { AuthProvider } from './context/AuthContext';
-import { useState } from 'react';
-import { useAuth } from './context/AuthContext';
+import SellerDashboard from './components/seller/SellerDashboard';
+import RoleSelector from './components/common/RoleSelector';
 import { 
   Layout, 
   Card, 
@@ -26,7 +28,6 @@ import {
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
-// Estilos para el dashboard
 const styles = {
   dashboardLayout: {
     minHeight: '100vh',
@@ -65,8 +66,22 @@ const styles = {
   }
 };
 
-// Dashboard component
-function Dashboard() {
+function LoadingScreen() {
+  return (
+    <div style={styles.loadingContainer}>
+      <Card style={styles.loadingCard}>
+        <div style={{ textAlign: 'center', padding: '40px' }}>
+          <Spin size="large" />
+          <div style={{ marginTop: '16px' }}>
+            <Text>Cargando...</Text>
+          </div>
+        </div>
+      </Card>
+    </div>
+  );
+}
+
+function GeneralDashboard() {
   const { user, logout } = useAuth();
 
   const getRoleDisplay = (role) => {
@@ -78,7 +93,7 @@ function Dashboard() {
     }
   };
 
-  const roleInfo = getRoleDisplay(user.role);
+  const roleInfo = getRoleDisplay(user?.role);
 
   return (
     <Layout style={styles.dashboardLayout}>
@@ -100,7 +115,7 @@ function Dashboard() {
               icon={roleInfo.icon}
             />
             <Text style={{ color: 'white', fontWeight: '600' }}>
-              {user.name} {user.lastName}
+              {user?.name} {user?.lastName}
             </Text>
             <Button 
               type="primary" 
@@ -127,7 +142,7 @@ function Dashboard() {
                     icon={roleInfo.icon}
                   />
                   <Title level={2} style={{ color: 'white', margin: '0 0 10px 0' }}>
-                    ¡Bienvenido, {user.name}! 🎉
+                    ¡Bienvenido, {user?.name}! 🎉
                   </Title>
                   <Text style={{ color: 'rgba(255,255,255,0.9)', fontSize: '16px' }}>
                     Has iniciado sesión exitosamente como <strong>{roleInfo.text}</strong>
@@ -150,17 +165,17 @@ function Dashboard() {
                   <div>
                     <Text strong>ID de Usuario:</Text>
                     <br />
-                    <Text code>{user.id}</Text>
+                    <Text code>{user?.id}</Text>
                   </div>
                   <div>
                     <Text strong>Nombre Completo:</Text>
                     <br />
-                    <Text>{user.name} {user.lastName}</Text>
+                    <Text>{user?.name} {user?.lastName}</Text>
                   </div>
                   <div>
                     <Text strong>Email:</Text>
                     <br />
-                    <Text>{user.email}</Text>
+                    <Text>{user?.email}</Text>
                   </div>
                 </Space>
               </Card>
@@ -186,12 +201,17 @@ function Dashboard() {
                     {roleInfo.text}
                   </Title>
                   <Text type="secondary">
-                    {user.role === 'VENDEDOR' && 'Puedes crear y gestionar productos'}
-                    {user.role === 'COMPRADOR' && 'Puedes comprar y ver productos'}
-                    {user.role === 'ADMIN' && 'Tienes acceso completo al sistema'}
+                    {user?.role === 'VENDEDOR' && 'Puedes crear y gestionar productos'}
+                    {user?.role === 'COMPRADOR' && 'Puedes comprar y ver productos'}
+                    {user?.role === 'ADMIN' && 'Tienes acceso completo al sistema'}
+                    {!user?.role && 'Rol no especificado - Contacta al administrador'}
                   </Text>
                 </div>
               </Card>
+            </Col>
+
+            <Col xs={24}>
+              <RoleSelector />
             </Col>
           </Row>
         </div>
@@ -200,34 +220,8 @@ function Dashboard() {
   );
 }
 
-// Loading component
-function LoadingScreen() {
-  return (
-    <div style={styles.loadingContainer}>
-      <Card style={styles.loadingCard}>
-        <div style={{ textAlign: 'center', padding: '40px' }}>
-          <Spin size="large" />
-          <div style={{ marginTop: '16px' }}>
-            <Text>Cargando...</Text>
-          </div>
-        </div>
-      </Card>
-    </div>
-  );
-}
-
-// Main App content (inside AuthProvider)
-function AppContent() {
-  const { isAuthenticated, loading } = useAuth();
-  const [currentView, setCurrentView] = useState('login'); // 'login' | 'register'
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (isAuthenticated) {
-    return <Dashboard />;
-  }
+function AuthPages() {
+  const [currentView, setCurrentView] = useState('login');
 
   if (currentView === 'register') {
     return <Register onSwitchToLogin={() => setCurrentView('login')} />;
@@ -236,11 +230,79 @@ function AppContent() {
   return <Login onSwitchToRegister={() => setCurrentView('register')} />;
 }
 
-// Main App component
+function ProtectedRoute({ children, allowedRoles = [] }) {
+  const { isAuthenticated, loading, user } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+}
+
+function RoleBasedRedirect() {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+
+  if (!user?.role) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  switch (user.role) {
+    case 'VENDEDOR':
+      return <Navigate to="/seller" replace />;
+    case 'COMPRADOR':
+    case 'ADMIN':
+      return <Navigate to="/dashboard" replace />;
+    default:
+      return <Navigate to="/dashboard" replace />;
+  }
+}
+
 function App() {
   return (
     <AuthProvider>
-      <AppContent />
+      <Router>
+        <Routes>
+          <Route path="/auth" element={<AuthPages />} />
+          
+          <Route
+            path="/seller/*"
+            element={
+              <ProtectedRoute allowedRoles={['VENDEDOR']}>
+                <SellerDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <GeneralDashboard />
+              </ProtectedRoute>
+            }
+          />
+          
+          <Route path="/" element={<RoleBasedRedirect />} />
+          <Route path="*" element={<RoleBasedRedirect />} />
+        </Routes>
+      </Router>
     </AuthProvider>
   );
 }
