@@ -13,7 +13,7 @@ const productService = {
         },
       });
 
-      return response.data;
+      return response.data; // Retorna { imageUrl: "http://localhost:8080/images/6" }
     } catch (error) {
       throw productService._handleError(error);
     }
@@ -29,27 +29,31 @@ const productService = {
     }
   },
 
-  // Obtener productos del usuario
+  // Obtener todos los productos
+  getAllProducts: async () => {
+    try {
+      const response = await api.get('/products');
+      return response.data.products || []; // Retorna el array de productos
+    } catch (error) {
+      throw productService._handleError(error);
+    }
+  },
+
+  // Obtener productos del usuario (sin filtrar por ahora, ya que no viene userId en la respuesta)
   getUserProducts: async (userId) => {
     try {
-      const response = await api.get(`/products/user/${userId}`);
-      return response.data;
+      const response = await api.get('/products');
+      const allProducts = response.data.products || [];
+      
+      // Por ahora retornamos todos los productos
+      // TODO: El backend debería devolver userId en cada producto para filtrar correctamente
+      return allProducts;
     } catch (error) {
       throw productService._handleError(error);
     }
   },
 
-  // Obtener categorías
-  getCategories: async () => {
-    try {
-      const response = await api.get('/categories');
-      return response.data;
-    } catch (error) {
-      throw productService._handleError(error);
-    }
-  },
-
-  // Actualizar producto
+  // Actualizar producto (si tienes endpoint PUT)
   updateProduct: async (productId, productData) => {
     try {
       const response = await api.put(`/products/${productId}`, productData);
@@ -59,7 +63,7 @@ const productService = {
     }
   },
 
-  // Eliminar producto
+  // Eliminar producto (si tienes endpoint DELETE)
   deleteProduct: async (productId) => {
     try {
       const response = await api.delete(`/products/${productId}`);
@@ -69,31 +73,42 @@ const productService = {
     }
   },
 
+  // Obtener categorías (mock por ahora, puedes cambiar por tu endpoint real)
+  getCategories: async () => {
+    try {
+      // Si tienes un endpoint para categorías, úsalo aquí:
+      // const response = await api.get('/categories');
+      // return response.data;
+      
+      // Por ahora retornamos categorías mock
+      return [
+        { id: 1, name: 'Maquillaje' },
+        { id: 2, name: 'Electrónicos' },
+        { id: 3, name: 'Ropa' },
+        { id: 4, name: 'Hogar' },
+        { id: 5, name: 'Deportes' },
+        { id: 6, name: 'Libros' }
+      ];
+    } catch (error) {
+      throw productService._handleError(error);
+    }
+  },
+
   // Manejo de errores
   _handleError: (error) => {
     if (error.response) {
       const { status, data } = error.response;
-      
-      switch (status) {
-        case 400:
-          return new Error(data.message || 'Datos inválidos');
-        case 401:
-          return new Error('No tienes autorización para realizar esta acción');
-        case 403:
-          return new Error('No tienes permisos para realizar esta acción');
-        case 404:
-          return new Error('Recurso no encontrado');
-        case 409:
-          return new Error(data.message || 'Conflicto en los datos');
-        case 413:
-          return new Error('El archivo es demasiado grande');
-        case 422:
-          return new Error(data.message || 'Datos de entrada inválidos');
-        case 500:
-          return new Error('Error interno del servidor');
-        default:
-          return new Error(data.message || `Error ${status}`);
-      }
+      const messages = {
+        400: 'Datos inválidos',
+        401: 'No tienes autorización para realizar esta acción',
+        403: 'No tienes permisos para realizar esta acción',
+        404: 'Recurso no encontrado',
+        409: 'Conflicto en los datos',
+        413: 'El archivo es demasiado grande',
+        422: 'Datos de entrada inválidos',
+        500: 'Error interno del servidor'
+      };
+      return new Error(data.message || messages[status] || `Error ${status}`);
     } else if (error.request) {
       return new Error('No se pudo conectar al servidor. Verifica tu conexión.');
     } else {
