@@ -1,0 +1,367 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Layout,
+  Card,
+  Button,
+  Table,
+  Space,
+  Typography,
+  Statistic,
+  Row,
+  Col,
+  Modal,
+  message,
+  Tag,
+  Image,
+  Popconfirm,
+  Empty,
+  Avatar
+} from 'antd';
+import {
+  PlusOutlined,
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  ShopOutlined,
+  DollarOutlined,
+  InboxOutlined,
+  BarChartOutlined
+} from '@ant-design/icons';
+import { useAuth } from '../../context/AuthContext';
+import productService from '../../services/productService';
+import ProductForm from './ProductForm';
+
+const { Header, Content } = Layout;
+const { Title, Text } = Typography;
+
+const SellerDashboard = () => {
+  const { user, logout } = useAuth();
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showProductForm, setShowProductForm] = useState(false);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(null);
+
+  useEffect(() => {
+    loadUserProducts();
+  }, []);
+
+  const loadUserProducts = async () => {
+    setLoading(true);
+    try {
+      const userProducts = await productService.getUserProducts(user.id);
+      setProducts(userProducts || []);
+    } catch (error) {
+      message.error('Error al cargar productos: ' + error.message);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateProduct = () => {
+    setEditingProduct(null);
+    setShowProductForm(true);
+  };
+
+  const handleEditProduct = (product) => {
+    setEditingProduct(product);
+    setShowProductForm(true);
+  };
+
+  const handleDeleteProduct = async (productId) => {
+    setDeleteLoading(productId);
+    try {
+      await productService.deleteProduct(productId);
+      message.success('Producto eliminado exitosamente');
+      await loadUserProducts();
+    } catch (error) {
+      message.error('Error al eliminar producto: ' + error.message);
+    } finally {
+      setDeleteLoading(null);
+    }
+  };
+
+  const handleProductFormSuccess = async () => {
+    setShowProductForm(false);
+    setEditingProduct(null);
+    await loadUserProducts();
+  };
+
+  const handleProductFormCancel = () => {
+    setShowProductForm(false);
+    setEditingProduct(null);
+  };
+
+  const totalProducts = products.length;
+  const totalValue = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
+  const totalStock = products.reduce((sum, product) => sum + product.quantity, 0);
+  const lowStockProducts = products.filter(product => product.quantity < 5).length;
+
+  const columns = [
+    {
+      title: 'Imagen',
+      dataIndex: 'imageUrl',
+      key: 'imageUrl',
+      width: 80,
+      render: (imageUrl) => (
+        <Image
+          width={60}
+          height={60}
+          src={imageUrl}
+          style={{ 
+            objectFit: 'cover',
+            borderRadius: 8
+          }}
+        />
+      )
+    },
+    {
+      title: 'Producto',
+      dataIndex: 'name',
+      key: 'name',
+      render: (text, record) => (
+        <div>
+          <Text strong>{text}</Text>
+          <br />
+          <Text type="secondary" style={{ fontSize: '12px' }}>
+            {record.category?.name}
+          </Text>
+        </div>
+      )
+    },
+    {
+      title: 'Precio',
+      dataIndex: 'price',
+      key: 'price',
+      render: (price) => (
+        <Text strong style={{ color: '#52c41a' }}>
+          ${price?.toLocaleString()}
+        </Text>
+      )
+    },
+    {
+      title: 'Stock',
+      dataIndex: 'quantity',
+      key: 'quantity',
+      render: (quantity) => (
+        <Tag color={quantity < 5 ? 'red' : quantity < 10 ? 'orange' : 'green'}>
+          {quantity} unidades
+        </Tag>
+      )
+    },
+    {
+      title: 'Valor Total',
+      key: 'totalValue',
+      render: (_, record) => (
+        <Text strong>
+          ${(record.price * record.quantity)?.toLocaleString()}
+        </Text>
+      )
+    },
+    {
+      title: 'Acciones',
+      key: 'actions',
+      width: 120,
+      render: (_, record) => (
+        <Space size="small">
+          <Button
+            type="text"
+            icon={<EyeOutlined />}
+            onClick={() => {
+              Modal.info({
+                title: record.name,
+                content: (
+                  <div>
+                    <p><strong>Descripción:</strong> {record.description}</p>
+                    <p><strong>Categoría:</strong> {record.category?.name}</p>
+                    <p><strong>Precio:</strong> ${record.price}</p>
+                    <p><strong>Stock:</strong> {record.quantity} unidades</p>
+                    {record.imageUrl && (
+                      <div>
+                        <strong>Imagen:</strong>
+                        <div style={{ marginTop: 8 }}>
+                          <Image width={200} height={150} src={record.imageUrl} style={{ objectFit: 'cover' }} />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ),
+                width: 600
+              });
+            }}
+          />
+          <Button
+            type="text"
+            icon={<EditOutlined />}
+            onClick={() => handleEditProduct(record)}
+          />
+          <Popconfirm
+            title="¿Estás seguro de eliminar este producto?"
+            description="Esta acción no se puede deshacer"
+            onConfirm={() => handleDeleteProduct(record.id)}
+            okText="Sí, eliminar"
+            cancelText="Cancelar"
+          >
+            <Button
+              type="text"
+              danger
+              icon={<DeleteOutlined />}
+              loading={deleteLoading === record.id}
+            />
+          </Popconfirm>
+        </Space>
+      )
+    }
+  ];
+
+  return (
+    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
+      <Header style={{ 
+        background: 'linear-gradient(90deg, #1890ff, #36cfc9)',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+        padding: '0 24px'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          height: '100%'
+        }}>
+          <Space>
+            <Avatar style={{ backgroundColor: '#1890ff' }} icon={<ShopOutlined />} />
+            <Title level={3} style={{ color: 'white', margin: 0 }}>
+              Panel de Vendedor
+            </Title>
+          </Space>
+          <Space>
+            <Text style={{ color: 'white', fontWeight: '600' }}>
+              {user.name} {user.lastName}
+            </Text>
+            <Button type="primary" danger onClick={logout}>
+              Cerrar Sesión
+            </Button>
+          </Space>
+        </div>
+      </Header>
+
+      <Content style={{ padding: '24px' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Total Productos"
+                  value={totalProducts}
+                  prefix={<InboxOutlined />}
+                  valueStyle={{ color: '#1890ff' }}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Valor Total Inventario"
+                  value={totalValue}
+                  prefix={<DollarOutlined />}
+                  valueStyle={{ color: '#52c41a' }}
+                  formatter={(value) => `$${value.toLocaleString()}`}
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Stock Total"
+                  value={totalStock}
+                  prefix={<BarChartOutlined />}
+                  valueStyle={{ color: '#722ed1' }}
+                  suffix="unidades"
+                />
+              </Card>
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Card>
+                <Statistic
+                  title="Stock Bajo"
+                  value={lowStockProducts}
+                  valueStyle={{ color: lowStockProducts > 0 ? '#ff4d4f' : '#52c41a' }}
+                  suffix="productos"
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          <Card 
+            title={
+              <Space>
+                <InboxOutlined />
+                <span>Mis Productos</span>
+                {products.length > 0 && (
+                  <Text type="secondary">({products.length} productos)</Text>
+                )}
+              </Space>
+            }
+            extra={
+              <Button 
+                type="primary" 
+                icon={<PlusOutlined />}
+                onClick={handleCreateProduct}
+                size="large"
+              >
+                Nuevo Producto
+              </Button>
+            }
+          >
+            {products.length === 0 && !loading ? (
+              <Empty
+                description="No tienes productos creados"
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+              >
+                <Button 
+                  type="primary" 
+                  icon={<PlusOutlined />}
+                  onClick={handleCreateProduct}
+                >
+                  Crear mi primer producto
+                </Button>
+              </Empty>
+            ) : (
+              <Table
+                columns={columns}
+                dataSource={products}
+                rowKey="id"
+                loading={loading}
+                pagination={{
+                  pageSize: 10,
+                  showSizeChanger: true,
+                  showQuickJumper: true,
+                  showTotal: (total, range) => 
+                    `${range[0]}-${range[1]} de ${total} productos`
+                }}
+                scroll={{ x: 800 }}
+              />
+            )}
+          </Card>
+        </div>
+      </Content>
+
+      <Modal
+        title={null}
+        open={showProductForm}
+        onCancel={handleProductFormCancel}
+        footer={null}
+        width={1000}
+        destroyOnClose
+      >
+        <ProductForm
+          product={editingProduct}
+          onSuccess={handleProductFormSuccess}
+          onCancel={handleProductFormCancel}
+        />
+      </Modal>
+    </Layout>
+  );
+};
+
+export default SellerDashboard;
