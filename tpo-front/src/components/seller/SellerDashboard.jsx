@@ -21,7 +21,6 @@ import {
   PlusOutlined,
   EditOutlined,
   DeleteOutlined,
-  EyeOutlined,
   ShopOutlined,
   DollarOutlined,
   InboxOutlined,
@@ -72,7 +71,7 @@ const SellerDashboard = () => {
   const handleDeleteProduct = async (productId) => {
     setDeleteLoading(productId);
     try {
-      await productService.deleteProduct(productId);
+      await productService.deleteProduct(productId, user.id);
       message.success('Producto eliminado exitosamente');
       await loadUserProducts();
     } catch (error) {
@@ -165,32 +164,6 @@ const SellerDashboard = () => {
       width: 120,
       render: (_, record) => (
         <Space size="small">
-          <Button
-            type="text"
-            icon={<EyeOutlined />}
-            onClick={() => {
-              Modal.info({
-                title: record.name,
-                content: (
-                  <div>
-                    <p><strong>Descripción:</strong> {record.description}</p>
-                    <p><strong>Categoría:</strong> {record.category?.name}</p>
-                    <p><strong>Precio:</strong> ${record.price}</p>
-                    <p><strong>Stock:</strong> {record.quantity} unidades</p>
-                    {record.imageUrl && (
-                      <div>
-                        <strong>Imagen:</strong>
-                        <div style={{ marginTop: 8 }}>
-                          <Image width={200} height={150} src={record.imageUrl} style={{ objectFit: 'cover' }} />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ),
-                width: 600
-              });
-            }}
-          />
           <Button
             type="text"
             icon={<EditOutlined />}
