@@ -5,6 +5,7 @@ import AuthPages from '../components/auth/AuthPages';
 import GeneralDashboard from '../components/dashboard/GeneralDashboard';
 import SellerDashboard from '../components/seller/SellerDashboard';
 import LoadingScreen from '../components/common/LoadingScreen';
+import ProductsList from '../components/ProductsList';
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isAuthenticated, loading, user } = useAuth();
@@ -70,6 +71,13 @@ function AppRoutes() {
           <ProtectedRoute>
             <GeneralDashboard />
           </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/products"
+        element={
+            <ProductsList />
         }
       />
       
