@@ -1,5 +1,5 @@
 import './ProductsList.css';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { Pagination } from 'antd';

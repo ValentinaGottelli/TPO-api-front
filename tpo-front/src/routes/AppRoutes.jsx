@@ -6,6 +6,8 @@ import GeneralDashboard from '../components/dashboard/GeneralDashboard';
 import SellerDashboard from '../components/seller/SellerDashboard';
 import LoadingScreen from '../components/common/LoadingScreen';
 import ProductsList from '../components/ProductsList';
+import CheckoutPage from '../components/buyer/checkout/Checkout';
+import CheckoutSuccessPage from '../components/buyer/checkout/SuccessCheckout';
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isAuthenticated, loading, user } = useAuth();
@@ -79,6 +81,20 @@ function AppRoutes() {
         element={
             <ProductsList />
         }
+      />
+
+      <Route
+        path="/checkout"
+        element={
+            <CheckoutPage/>
+        }
+      />
+
+      <Route
+        path='/checkout/success'
+        element={
+          <CheckoutSuccessPage />
+         }
       />
       
       <Route path="/" element={<RoleBasedRedirect />} />
