@@ -39,15 +39,28 @@ const productService = {
     }
   },
 
-  // Obtener productos del usuario
-getUserProducts: async (userId) => {
-  try {
-    const response = await api.get(`/products/user/${userId}`);
-    return response.data.products || [];
-  } catch (error) {
-    throw productService._handleError(error);
-  }
-},
+  getProductById: async (id) => {
+    try {
+      const response = await api.get(`/products/${id}`);
+      return response.data;
+    } catch (error) {
+      throw productService._handleError(error);
+    }
+  },
+
+  // Obtener productos del usuario (sin filtrar por ahora, ya que no viene userId en la respuesta)
+  getUserProducts: async (userId) => {
+    try {
+      const response = await api.get('/products');
+      const allProducts = response.data.products || [];
+      
+      // Por ahora retornamos todos los productos
+      // TODO: El backend debería devolver userId en cada producto para filtrar correctamente
+      return allProducts;
+    } catch (error) {
+      throw productService._handleError(error);
+    }
+  },
 
   // Actualizar producto (si tienes endpoint PUT)
   updateProduct: async (productId, productData) => {
@@ -59,37 +72,21 @@ getUserProducts: async (userId) => {
     }
   },
 
-  // Eliminar producto (usando el endpoint actual con body)
-  deleteProduct: async (productId, userId) => {
+  // Eliminar producto (si tienes endpoint DELETE)
+  deleteProduct: async (productId) => {
     try {
-      const response = await api.delete('/products', {
-        data: {
-          productId: productId,
-          userId: userId
-        }
-      });
+      const response = await api.delete(`/products/${productId}`);
       return response.data;
     } catch (error) {
       throw productService._handleError(error);
     }
   },
 
-  // Obtener categorías (mock por ahora, puedes cambiar por tu endpoint real)
-  getCategories: async () => {
+  // Obtener productos por categoría
+  getProductsByCategory: async (categoryId) => {
     try {
-      // Si tienes un endpoint para categorías, úsalo aquí:
-      // const response = await api.get('/categories');
-      // return response.data;
-      
-      // Por ahora retornamos categorías mock
-      return [
-        { id: 1, name: 'Maquillaje' },
-        { id: 2, name: 'Electrónicos' },
-        { id: 3, name: 'Ropa' },
-        { id: 4, name: 'Hogar' },
-        { id: 5, name: 'Deportes' },
-        { id: 6, name: 'Libros' }
-      ];
+      const response = await api.get(`/products/category/${categoryId}`);
+      return response.data.products || [];
     } catch (error) {
       throw productService._handleError(error);
     }
