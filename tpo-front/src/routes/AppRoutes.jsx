@@ -6,6 +6,7 @@ import GeneralDashboard from '../components/dashboard/GeneralDashboard';
 import SellerDashboard from '../components/seller/SellerDashboard';
 import LoadingScreen from '../components/common/LoadingScreen';
 import ProductsList from '../components/ProductsList';
+import ProductDetail from '../components/ProductDetail';
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isAuthenticated, loading, user } = useAuth();
@@ -80,7 +81,12 @@ function AppRoutes() {
             <ProductsList />
         }
       />
-      
+      <Route
+        path="/products/:id"
+        element={
+            <ProductDetail />
+        }
+      />
       <Route path="/" element={<RoleBasedRedirect />} />
       <Route path="*" element={<RoleBasedRedirect />} />
     </Routes>
