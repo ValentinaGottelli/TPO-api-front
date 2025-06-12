@@ -83,6 +83,20 @@ function AppRoutes() {
         }
       />
 
+<Route
+        path="/checkout"
+        element={
+            <CheckoutPage/>
+        }
+      />
+
+      <Route
+        path='/checkout/success'
+        element={
+          <CheckoutSuccessPage />
+         }
+      />
+
       <Route path="/" element={<RoleBasedRedirect />} />
       <Route path="*" element={<RoleBasedRedirect />} />
     </Routes>

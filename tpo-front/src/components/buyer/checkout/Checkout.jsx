@@ -31,10 +31,10 @@ const CheckoutPage = () => {
     const navigate = useNavigate()
 
     useEffect(() => {
-        if (error) {
-          message.error(error.message || 'Error inesperado');
+        if (error || prodError) {
+          message.error(error.message || 'Ocurrió un error inesperado');
         }
-      }, [error]);
+      }, [error, prodError]);
 
   const handleCheckout = async () => {
       const result = await confirmCheckout()
