@@ -55,7 +55,7 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/auth" element={<AuthPages />} />
-      
+
       <Route
         path="/seller/*"
         element={
@@ -64,7 +64,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/dashboard"
         element={
@@ -77,10 +77,10 @@ function AppRoutes() {
       <Route
         path="/products"
         element={
-            <ProductsList />
+          <ProductsList />
         }
       />
-      
+
       <Route path="/" element={<RoleBasedRedirect />} />
       <Route path="*" element={<RoleBasedRedirect />} />
     </Routes>
