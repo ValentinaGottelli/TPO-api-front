@@ -1,0 +1,27 @@
+.product-container {
+  background-color: aqua;
+  padding-right: 10px;
+}
+
+.cart-image {
+  min-width: 80px;
+  max-width: 130px;
+}
+
+.cart-image > img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.cart-price {
+  margin: 0;
+  text-align: center;
+  min-width: 200px;
+  font-size: 2rem;
+}
+
+.total-title,
+.total-price {
+  font-size: 3rem;
+}
