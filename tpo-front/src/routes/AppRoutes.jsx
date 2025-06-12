@@ -8,6 +8,8 @@ import LoadingScreen from "../components/common/LoadingScreen";
 import ProductsList from "../components/ProductsList";
 import ProductDetail from "../components/ProductDetail";
 import Cart from "../components/cart/Cart";
+import CheckoutPage from "../components/buyer/checkout/Checkout";
+import CheckoutSuccessPage from "../components/buyer/checkout/SuccessCheckout";
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isAuthenticated, loading, user } = useAuth();
@@ -81,8 +83,11 @@ function AppRoutes() {
       />
 
       <Route path="/products" element={<ProductsList />} />
-      <Route path="/products/:id" element={<ProductDetail />} />
-      <Route path="/cart" element={<Cart />} />
+
+      <Route path="/checkout" element={<CheckoutPage />} />
+
+      <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
+
       <Route path="/" element={<RoleBasedRedirect />} />
       <Route path="*" element={<RoleBasedRedirect />} />
     </Routes>
