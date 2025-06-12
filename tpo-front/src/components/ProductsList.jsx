@@ -1,9 +1,9 @@
 import './ProductsList.css';
-import { useAuth } from '../context/AuthContext';
 import { UserOutlined, ShoppingCartOutlined } from '@ant-design/icons';
 import { Link, useNavigate } from 'react-router-dom';
 import { Pagination } from 'antd';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 const mockProducts = [
     {
