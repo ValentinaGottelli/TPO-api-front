@@ -152,17 +152,17 @@ const authService = {
     if (error.response) {
       const { status, data } = error.response;
       const messages = {
-        400: 'Datos inválidos',
-        401: 'Credenciales inválidas',
-        403: 'No tienes permisos para realizar esta acción',
+        400: 'Datos invalidos',
+        401: 'Credenciales invalidas',
+        403: 'No tienes permisos para realizar esta accion',
         404: 'Servicio no encontrado',
         409: 'El usuario ya existe',
-        422: 'Datos de entrada inválidos',
+        422: 'Datos de entrada invalidos',
         500: 'Error interno del servidor'
       };
       return new Error(data.message || messages[status] || `Error ${status}`);
     } else if (error.request) {
-      return new Error('No se pudo conectar al servidor. Verifica tu conexión.');
+      return new Error('No se pudo conectar al servidor. Verifica tu conexion.');
     } else {
       return new Error(error.message || 'Error inesperado');
     }
