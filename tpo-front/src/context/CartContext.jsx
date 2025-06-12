@@ -11,17 +11,17 @@ export const CartProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    const loadCart = async () => {
-      try {
-        const data = await cartService.getCart();
-        setCart(data);
-      } catch (error) {
-        console.error("Error loading cart:", error);
-      }
-    };
-
     loadCart();
   }, []);
+
+  const loadCart = async () => {
+    try {
+      const data = await cartService.getCart();
+      setCart(data);
+    } catch (error) {
+      console.error("Error loading cart:", error);
+    }
+  };
 
   const addToCart = async (product) => {
     try {
@@ -102,6 +102,7 @@ export const CartProvider = ({ children }) => {
         cartDrawer,
         handleCartClick,
         getTotalPriceCart,
+        loadCart
       }}
     >
       {children}

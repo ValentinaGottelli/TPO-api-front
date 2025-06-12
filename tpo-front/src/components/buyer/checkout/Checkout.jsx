@@ -47,7 +47,7 @@ const CheckoutPage = () => {
   };
     
     const navHome = () => { 
-        navigate("/")
+        navigate("/cart")
     }
 
   return (

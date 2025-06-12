@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useCart } from "../../context/CartContext";
 import { Space, Button, Drawer, Flex, Typography } from "antd";
 const { Title } = Typography;
@@ -9,6 +10,7 @@ import {
   FrownOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 export const CartDrawer = () => {
   const {
@@ -18,6 +20,7 @@ export const CartDrawer = () => {
     addToCart,
     subtractToCart,
     removeFromCart,
+    loadCart
   } = useCart([]);
   const navigate = useNavigate();
 
@@ -25,6 +28,10 @@ export const CartDrawer = () => {
     navigate("/cart");
     handleCartClick();
   };
+
+  useEffect(() => {
+    loadCart();
+  }, []);
 
   return (
     <>

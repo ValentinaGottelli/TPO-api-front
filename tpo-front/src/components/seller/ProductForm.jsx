@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons';
 import { useAuth } from '../../context/AuthContext';
 import productService from '../../services/productService';
+import categoryService from '../../services/categoryService';
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
@@ -56,16 +57,11 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
 
   const loadCategories = async () => {
     try {
-      const categoriesData = await productService.getCategories();
+      const categoriesData = await categoryService.getAllCategories();
       setCategories(categoriesData);
     } catch (error) {
       message.error('Error al cargar categorías: ' + error.message);
-      setCategories([
-        { id: 1, name: 'Maquillaje' },
-        { id: 2, name: 'Electrónicos' },
-        { id: 3, name: 'Ropa' },
-        { id: 4, name: 'Hogar' }
-      ]);
+      setCategories([]);
     }
   };
 

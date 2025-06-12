@@ -31,7 +31,7 @@ export const Cart = () => {
   const navigate = useNavigate();
 
   const handleFinalizarCompraClick = () => {
-    navigate("/check");
+    navigate("/checkout");
   };
   const handleContinuarComprandoClick = () => {
     navigate("/products");

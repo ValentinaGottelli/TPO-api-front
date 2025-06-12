@@ -103,28 +103,24 @@ export const ProductsList = () => {
         selectedCategory={selectedCategory}
       />
       <div className="products-grid">
-        {products.map((product) => (
-          <div
-            key={product.id}
-            className="product-card"
-            onClick={() => handleProductClick(product.id)}
-          >
-            <div className="product-image">
-              <img src={product.imageUrl} alt={product.name} />
-            </div>
-            <h2>{product.name}</h2>
-            <div className="price">${product.price.toFixed(2)}</div>
-            <div className="category">{product.category.name}</div>
-            <div className="quantity">Stock disponible: {product.quantity}</div>
-            <Button
-              onClick={(e) => handleAddCartClick(e, product)}
-              type="primary"
-            >
-              Add Cart
-            </Button>
-          </div>
-        ))}
+  {products
+    .filter(product => product.quantity > 0)
+    .map(product => (
+      <div 
+        key={product.id} 
+        className="product-card"
+        onClick={() => handleProductClick(product.id)}
+      >
+        <div className="product-image">
+          <img src={product.imageUrl} alt={product.name} />
+        </div>
+        <h2>{product.name}</h2>
+        <div className="price">${product.price.toFixed(2)}</div>
+        <div className="category">{product.category.name}</div>
+        <div className="quantity">Stock disponible: {product.quantity}</div>
       </div>
+    ))}
+</div>
       <div className="pagination-container">
         <Pagination
           current={currentPage}

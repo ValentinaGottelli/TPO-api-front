@@ -8,10 +8,11 @@ const useGetCart = () => {
     useEffect(() => {
         const fetchCart = async () => {
             try {
-                const result = await cartService.getCart();
+                const result = await cartService.getCartC();
                 console.log(result)
                 setCart(result);
-            } catch(error) {
+            } catch (error) {
+                console.log(error)
                 setError(error);
             }
         }
