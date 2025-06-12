@@ -1,13 +1,15 @@
-import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import AuthPages from '../components/auth/AuthPages';
-import GeneralDashboard from '../components/dashboard/GeneralDashboard';
-import SellerDashboard from '../components/seller/SellerDashboard';
-import LoadingScreen from '../components/common/LoadingScreen';
-import ProductsList from '../components/ProductsList';
-import CheckoutPage from '../components/buyer/checkout/Checkout';
-import CheckoutSuccessPage from '../components/buyer/checkout/SuccessCheckout';
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import AuthPages from "../components/auth/AuthPages";
+import GeneralDashboard from "../components/dashboard/GeneralDashboard";
+import SellerDashboard from "../components/seller/SellerDashboard";
+import LoadingScreen from "../components/common/LoadingScreen";
+import ProductsList from "../components/ProductsList";
+import ProductDetail from "../components/ProductDetail";
+import Cart from "../components/cart/Cart";
+import CheckoutPage from "../components/buyer/checkout/Checkout";
+import CheckoutSuccessPage from "../components/buyer/checkout/SuccessCheckout";
 
 function ProtectedRoute({ children, allowedRoles = [] }) {
   const { isAuthenticated, loading, user } = useAuth();
@@ -20,7 +22,11 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (allowedRoles.length > 0 && user?.role && !allowedRoles.includes(user.role)) {
+  if (
+    allowedRoles.length > 0 &&
+    user?.role &&
+    !allowedRoles.includes(user.role)
+  ) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -43,10 +49,10 @@ function RoleBasedRedirect() {
   }
 
   switch (user.role) {
-    case 'VENDEDOR':
+    case "VENDEDOR":
       return <Navigate to="/seller" replace />;
-    case 'COMPRADOR':
-    case 'ADMIN':
+    case "COMPRADOR":
+    case "ADMIN":
       return <Navigate to="/dashboard" replace />;
     default:
       return <Navigate to="/dashboard" replace />;
@@ -61,7 +67,7 @@ function AppRoutes() {
       <Route
         path="/seller/*"
         element={
-          <ProtectedRoute allowedRoles={['VENDEDOR']}>
+          <ProtectedRoute allowedRoles={["VENDEDOR"]}>
             <SellerDashboard />
           </ProtectedRoute>
         }
@@ -76,26 +82,11 @@ function AppRoutes() {
         }
       />
 
-      <Route
-        path="/products"
-        element={
-          <ProductsList />
-        }
-      />
+      <Route path="/products" element={<ProductsList />} />
 
-<Route
-        path="/checkout"
-        element={
-            <CheckoutPage/>
-        }
-      />
+      <Route path="/checkout" element={<CheckoutPage />} />
 
-      <Route
-        path='/checkout/success'
-        element={
-          <CheckoutSuccessPage />
-         }
-      />
+      <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
 
       <Route path="/" element={<RoleBasedRedirect />} />
       <Route path="*" element={<RoleBasedRedirect />} />

@@ -1,0 +1,47 @@
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
+import { useAuth } from "../../context/AuthContext";
+import { useCart } from "../../context/CartContext";
+import "./Navbar.css";
+
+// si en un futuro agregamos searchbar, cambiar a true
+const Navbar = ({ shouldShowSearchbar = false, shouldShowCart = true }) => {
+  const { user, isAuthenticated } = useAuth();
+  const { cart, handleCartClick } = useCart([]);
+  const navigate = useNavigate();
+
+  const handleUserClick = () => {
+    navigate("/");
+  };
+
+  return (
+    <nav className="products-nav">
+      {shouldShowSearchbar && (
+        <form className="search-form">
+          <input type="text" placeholder="Buscar producto" />
+        </form>
+      )}
+      <div
+        className={`nav-actions ${
+          !shouldShowSearchbar ? "nav-actions-centered" : ""
+        }`}
+      >
+        {shouldShowCart && (
+          <div className="cart-section" onClick={() => handleCartClick()}>
+            <ShoppingCartOutlined className="cart-icon" />
+            <span className="cart-count">{cart.length}</span>
+          </div>
+        )}
+        <div className="user-section" onClick={handleUserClick}>
+          <UserOutlined className="user-icon" />
+          <span>
+            {isAuthenticated ? `${user?.name || "Usuario"}` : "Ingresar"}
+          </span>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;
