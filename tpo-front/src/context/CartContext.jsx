@@ -25,8 +25,8 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product) => {
     try {
-      const cartProduct = getProductFormated(product);
-      if (!cartProduct) {
+      const cartProduct = formatCartItemToAdd(product, 1);
+      if (product?.cartQuantity && product.cartQuantity >= product.quantity) {
         return;
       }
       const data = await cartService.addItemToCart(cartProduct);
@@ -89,28 +89,6 @@ export const CartProvider = ({ children }) => {
       productId: product.id,
       quantity: updateQuantity ?? product.cartQuantity,
     };
-  };
-
-  const getProductFormated = (product) => {
-    const hasCartQuantity = !!product?.cartQuantity;
-
-    if (hasCartQuantity) {
-      if (product.cartQuantity >= product.quantity) {
-        return null;
-      }
-      return formatCartItemToAdd(product);
-    }
-
-    const productInCart = cart.find((c) => c.id === product.id);
-    const currentQuantity = productInCart?.cartQuantity ?? 0;
-
-    if (currentQuantity >= product.quantity) {
-      return null;
-    }
-    return formatCartItemToAdd(
-      productInCart ?? product,
-      productInCart ? undefined : 1
-    );
   };
 
   return (

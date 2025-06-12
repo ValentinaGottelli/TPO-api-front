@@ -21,12 +21,9 @@ export const CartDrawer = () => {
   } = useCart([]);
   const navigate = useNavigate();
 
-  const onChange = (value) => {
-    console.log("changed", value);
-  };
-
   const navigateToCart = () => {
     navigate("/cart");
+    handleCartClick();
   };
 
   return (
