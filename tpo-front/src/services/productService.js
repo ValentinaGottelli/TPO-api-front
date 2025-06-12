@@ -62,7 +62,7 @@ const productService = {
     }
   },
 
-  // Actualizar producto (si tienes endpoint PUT)
+  // Actualizar producto
   updateProduct: async (productId, productData) => {
     try {
       const response = await api.put(`/products/${productId}`, productData);
@@ -72,7 +72,7 @@ const productService = {
     }
   },
 
-  // Eliminar producto (si tienes endpoint DELETE)
+  // Eliminar producto
   deleteProduct: async (productId) => {
     try {
       const response = await api.delete(`/products/${productId}`);
