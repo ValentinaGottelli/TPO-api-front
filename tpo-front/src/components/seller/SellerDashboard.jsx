@@ -15,7 +15,8 @@ import {
   Image,
   Popconfirm,
   Empty,
-  Avatar
+  Avatar,
+  Spin
 } from 'antd';
 import {
   PlusOutlined,
@@ -26,7 +27,7 @@ import {
   InboxOutlined,
   BarChartOutlined
 } from '@ant-design/icons';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthRedux } from '../../hooks/useAuth';
 import productService from '../../services/productService';
 import ProductForm from './ProductForm';
 
@@ -34,7 +35,7 @@ const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
 const SellerDashboard = () => {
-  const { user, logout } = useAuth();
+  const { user, logout, loading: authLoading } = useAuthRedux();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showProductForm, setShowProductForm] = useState(false);
@@ -42,10 +43,17 @@ const SellerDashboard = () => {
   const [deleteLoading, setDeleteLoading] = useState(null);
 
   useEffect(() => {
-    loadUserProducts();
-  }, []);
+    if (user && user.id) {
+      loadUserProducts();
+    }
+  }, [user]);
 
   const loadUserProducts = async () => {
+    if (!user || !user.id) {
+      console.error('No user ID available');
+      return;
+    }
+
     setLoading(true);
     try {
       const userProducts = await productService.getUserProducts(user.id);
@@ -69,6 +77,11 @@ const SellerDashboard = () => {
   };
 
   const handleDeleteProduct = async (productId) => {
+    if (!user || !user.id) {
+      message.error('Error: Usuario no autenticado');
+      return;
+    }
+
     setDeleteLoading(productId);
     try {
       await productService.deleteProduct(productId, user.id);
@@ -91,6 +104,35 @@ const SellerDashboard = () => {
     setShowProductForm(false);
     setEditingProduct(null);
   };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Force redirect even if logout fails
+      window.location.href = '/auth';
+    }
+  };
+
+  // Mostrar loading si el usuario aún se está cargando
+  if (authLoading || !user) {
+    return (
+      <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'center', 
+          alignItems: 'center', 
+          height: '100vh' 
+        }}>
+          <Space direction="vertical" align="center">
+            <Spin size="large" />
+            <Text>Cargando datos del usuario...</Text>
+          </Space>
+        </div>
+      </Layout>
+    );
+  }
 
   const totalProducts = products.length;
   const totalValue = products.reduce((sum, product) => sum + (product.price * product.quantity), 0);
@@ -211,7 +253,7 @@ const SellerDashboard = () => {
             <Text style={{ color: 'white', fontWeight: '600' }}>
               {user.name} {user.lastName}
             </Text>
-            <Button type="primary" danger onClick={logout}>
+            <Button type="primary" danger onClick={handleLogout}>
               Cerrar Sesión
             </Button>
           </Space>
@@ -238,7 +280,7 @@ const SellerDashboard = () => {
                   value={totalValue}
                   prefix={<DollarOutlined />}
                   valueStyle={{ color: '#52c41a' }}
-                  formatter={(value) => `$${value.toLocaleString()}`}
+                  formatter={(value) => `${value.toLocaleString()}`}
                 />
               </Card>
             </Col>

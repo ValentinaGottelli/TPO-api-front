@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuthRedux } from "../hooks/useAuth";
 import AuthPages from "../components/auth/AuthPages";
 import GeneralDashboard from "../components/dashboard/GeneralDashboard";
 import SellerDashboard from "../components/seller/SellerDashboard";
@@ -11,43 +11,21 @@ import Cart from "../components/cart/Cart";
 import CheckoutPage from "../components/buyer/checkout/Checkout";
 import CheckoutSuccessPage from "../components/buyer/checkout/SuccessCheckout";
 
-function ProtectedRoute({ children, allowedRoles = [] }) {
-  const { isAuthenticated, loading, user } = useAuth();
-
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/auth" replace />;
-  }
-
-  if (
-    allowedRoles.length > 0 &&
-    user?.role &&
-    !allowedRoles.includes(user.role)
-  ) {
-    return <Navigate to="/dashboard" replace />;
-  }
-
-  return children;
-}
-
 function RoleBasedRedirect() {
-  const { user, isAuthenticated, loading } = useAuth();
-
-  if (loading) {
+  const { user, isAuthenticated, loading, initialized } = useAuthRedux();
+  
+  if (loading || !initialized) {
     return <LoadingScreen />;
   }
-
+  
   if (!isAuthenticated) {
     return <Navigate to="/auth" replace />;
   }
-
+  
   if (!user?.role) {
     return <Navigate to="/dashboard" replace />;
   }
-
+  
   switch (user.role) {
     case "VENDEDOR":
       return <Navigate to="/seller" replace />;
@@ -62,37 +40,63 @@ function RoleBasedRedirect() {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/auth" element={<AuthPages />} />
-
+      {/* Rutas públicas de autenticación */}
+      <Route 
+        path="/auth" 
+        element={
+          <AuthGuard requireAuth={false}>
+            <AuthPages />
+          </AuthGuard>
+        } 
+      />
+      
+      {/* Rutas para vendedores */}
       <Route
         path="/seller/*"
         element={
-          <ProtectedRoute allowedRoles={["VENDEDOR"]}>
+          <AuthGuard requireAuth={true} allowedRoles={["VENDEDOR"]}>
             <SellerDashboard />
-          </ProtectedRoute>
+          </AuthGuard>
         }
       />
-
+      
+      {/* Dashboard general (todos los usuarios autenticados) */}
       <Route
         path="/dashboard"
         element={
-          <ProtectedRoute>
+          <AuthGuard requireAuth={true}>
             <GeneralDashboard />
-          </ProtectedRoute>
+          </AuthGuard>
         }
       />
-
+      
+      {/* Rutas públicas de productos */}
       <Route path="/products" element={<ProductsList />} />
-
-      <Route path="/products/:id" element={ <ProductDetail />} />
-
-      <Route path="/cart" element={ <Cart/>} />
-
-      <Route path="/checkout" element={<CheckoutPage />} />
-
-      <Route path="/checkout/success" element={<CheckoutSuccessPage />} />
-
+      <Route path="/products/:id" element={<ProductDetail />} />
+      
+      {/* Rutas del carrito */}
+      <Route path="/cart" element={<Cart />} />
+      <Route 
+        path="/checkout" 
+        element={
+          <AuthGuard requireAuth={true}>
+            <CheckoutPage />
+          </AuthGuard>
+        } 
+      />
+      <Route 
+        path="/checkout/success" 
+        element={
+          <AuthGuard requireAuth={true}>
+            <CheckoutSuccessPage />
+          </AuthGuard>
+        } 
+      />
+      
+      {/* Ruta raíz - redirigir según autenticación */}
       <Route path="/" element={<RoleBasedRedirect />} />
+      
+      {/* Catch all - redirigir según autenticación */}
       <Route path="*" element={<RoleBasedRedirect />} />
     </Routes>
   );

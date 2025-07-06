@@ -6,19 +6,22 @@ const STORAGE_KEYS = {
 };
 
 const authService = {
+  // Login - retorna datos limpios para Redux
   login: async (credentials) => {
     try {
       const loginData = {
         username: credentials.email,
         password: credentials.password
       };
-
+      
       const response = await api.post('/user/authenticate', loginData);
       const { access_token, user } = response.data;
-
+      
+      // Guardar en localStorage
       if (access_token) {
         localStorage.setItem(STORAGE_KEYS.TOKEN, access_token);
       }
+      
       if (user) {
         const userData = {
           id: user.id,
@@ -28,22 +31,32 @@ const authService = {
           role: user.role || 'COMPRADOR'
         };
         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+        
+        // Retornar datos estructurados para Redux
+        return {
+          user: userData,
+          access_token,
+          success: true
+        };
       }
-
-      return response.data;
+      
+      throw new Error('Datos de usuario inválidos');
     } catch (error) {
       throw authService._handleError(error);
     }
   },
 
+  // Register - retorna datos limpios para Redux
   register: async (userData) => {
     try {
       const response = await api.post('/user/register', userData);
       const { access_token, user } = response.data;
-
+      
+      // Guardar en localStorage
       if (access_token) {
         localStorage.setItem(STORAGE_KEYS.TOKEN, access_token);
       }
+      
       if (user) {
         const userDataToStore = {
           id: user.id,
@@ -53,14 +66,22 @@ const authService = {
           role: user.role || userData.role || 'COMPRADOR'
         };
         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userDataToStore));
+        
+        // Retornar datos estructurados para Redux
+        return {
+          user: userDataToStore,
+          access_token,
+          success: true
+        };
       }
-
-      return response.data;
+      
+      throw new Error('Datos de usuario inválidos');
     } catch (error) {
       throw authService._handleError(error);
     }
   },
 
+  // Logout - limpia todo
   logout: async () => {
     try {
       const token = authService.getToken();
@@ -68,14 +89,46 @@ const authService = {
         await api.post('/user/logout');
       }
     } catch (error) {
-      // Ignore logout errors
+      // Ignore logout errors pero limpiar storage
     } finally {
       authService.clearStorage();
     }
   },
 
-  getToken: () => localStorage.getItem(STORAGE_KEYS.TOKEN),
+  // Verificar si hay datos de autenticación válidos
+  // En authService.js debe estar este método:
+checkAuthState: () => {
+  try {
+    const token = authService.getToken();
+    const user = authService.getCurrentUser();
+    
+    if (user && user.id && user.email) {
+      return {
+        isAuthenticated: true,
+        user,
+        token
+      };
+    }
+    
+    authService.clearStorage();
+    return {
+      isAuthenticated: false,
+      user: null,
+      token: null
+    };
+  } catch (error) {
+    authService.clearStorage();
+    return {
+      isAuthenticated: false,
+      user: null,
+      token: null
+    };
+  }
+},
 
+  // Funciones de utilidad
+  getToken: () => localStorage.getItem(STORAGE_KEYS.TOKEN),
+  
   getCurrentUser: () => {
     try {
       const userStr = localStorage.getItem(STORAGE_KEYS.USER);
@@ -107,30 +160,20 @@ const authService = {
         role: userData.role || 'COMPRADOR'
       };
       localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userToStore));
-      return true;
+      return userToStore;
     } catch (error) {
-      return false;
+      return null;
     }
   },
 
-  isAuthenticated: () => {
-    const user = authService.getCurrentUser();
-    const token = authService.getToken();
-    return !!(user && (token || user.id));
+  clearStorage: () => {
+    Object.values(STORAGE_KEYS).forEach(key => {
+      localStorage.removeItem(key);
+    });
   },
 
-  getUserRole: () => {
-    const user = authService.getCurrentUser();
-    return user?.role || null;
-  },
-
-  getUserId: () => {
-    const user = authService.getCurrentUser();
-    return user?.id || null;
-  },
-
-  hasRole: (requiredRole) => {
-    const userRole = authService.getUserRole();
+  // Verificaciones de rol
+  hasRole: (userRole, requiredRole) => {
     if (!userRole || !requiredRole) return false;
     
     const roleHierarchy = {
@@ -138,14 +181,7 @@ const authService = {
       'VENDEDOR': 2,
       'COMPRADOR': 1
     };
-
     return roleHierarchy[userRole] >= roleHierarchy[requiredRole];
-  },
-
-  clearStorage: () => {
-    Object.values(STORAGE_KEYS).forEach(key => {
-      localStorage.removeItem(key);
-    });
   },
 
   _handleError: (error) => {

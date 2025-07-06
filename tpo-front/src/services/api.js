@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-// Use proxy in development, direct URL in production
+// En api.js - debe estar así:
 const API_BASE_URL = import.meta.env.DEV ? '/api' : 'http://localhost:8080';
 
 const api = axios.create({
@@ -13,15 +13,16 @@ const api = axios.create({
 });
 
 // Request interceptor to add auth token
+// En api.js, en el interceptor
 api.interceptors.request.use(
   (config) => {
+    console.log("🚀 URL COMPLETA:", config.baseURL + config.url); // ✅ Agregar esta línea
     console.log("BASE_URL = " + API_BASE_URL)
     const token = localStorage.getItem('access_token');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Log requests in development
     if (import.meta.env.DEV) {
       console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.url}`, {
         data: config.data,
@@ -31,6 +32,8 @@ api.interceptors.request.use(
     
     return config;
   },
+  // ...resto igual
+
   (error) => {
     console.error('❌ Request Error:', error);
     return Promise.reject(error);
