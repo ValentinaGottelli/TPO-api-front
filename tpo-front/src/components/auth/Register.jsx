@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthRedux } from '../../hooks/useAuth';
 import {
   Form,
   Input,
@@ -25,8 +25,30 @@ const { Option } = Select;
 
 const Register = ({ onSwitchToLogin }) => {
   const [loading, setLoading] = useState(false);
-  const { register, getRedirectPath } = useAuth();
+  const { 
+    register, 
+    getRedirectPath, 
+    isAuthenticated, 
+    loading: authLoading,
+    error,
+    clearError 
+  } = useAuthRedux();
   const navigate = useNavigate();
+
+  // Limpiar errores cuando el componente se monta
+  useEffect(() => {
+    if (error) {
+      clearError();
+    }
+  }, [error, clearError]);
+
+  // Redirigir si ya está autenticado
+  useEffect(() => {
+    if (isAuthenticated) {
+      const redirectPath = getRedirectPath();
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isAuthenticated, getRedirectPath, navigate]);
 
   const handleSubmit = async (values) => {
     setLoading(true);
@@ -49,6 +71,13 @@ const Register = ({ onSwitchToLogin }) => {
       setLoading(false);
     }
   };
+
+  // Mostrar error de Redux si existe
+  useEffect(() => {
+    if (error) {
+      message.error(error);
+    }
+  }, [error]);
 
   return (
     <div style={{
@@ -180,7 +209,7 @@ const Register = ({ onSwitchToLogin }) => {
               type="primary"
               htmlType="submit"
               size="large"
-              loading={loading}
+              loading={loading || authLoading}
               icon={<UserAddOutlined />}
               block
             >
@@ -206,4 +235,4 @@ const Register = ({ onSwitchToLogin }) => {
   );
 };
 
-export default Register ;
+export default Register;

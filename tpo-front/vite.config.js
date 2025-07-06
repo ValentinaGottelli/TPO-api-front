@@ -1,17 +1,16 @@
+// vite.config.js (mismo nivel que package.json)
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-    server: {
+  server: {
     proxy: {
-      // Proxy all /api requests to your backend
       '/api': {
         target: 'http://localhost:8080',
         changeOrigin: true,
         secure: false,
-        rewrite: (path) => path.replace(/^\/api/, '') // Remove /api prefix
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   }

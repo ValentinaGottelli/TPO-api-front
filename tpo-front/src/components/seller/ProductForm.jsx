@@ -21,7 +21,7 @@ import {
   PictureOutlined,
   InboxOutlined
 } from '@ant-design/icons';
-import { useAuth } from '../../context/AuthContext';
+import { useAuthRedux } from '../../hooks/useAuth';
 import productService from '../../services/productService';
 import categoryService from '../../services/categoryService';
 
@@ -31,7 +31,7 @@ const { Option } = Select;
 const { Dragger } = Upload;
 
 const ProductForm = ({ product = null, onSuccess, onCancel }) => {
-  const { user } = useAuth();
+  const { user } = useAuthRedux();
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(false);
@@ -88,6 +88,11 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async (values) => {
+    if (!user || !user.id) {
+      message.error('Error: Usuario no autenticado');
+      return;
+    }
+
     setLoading(true);
     try {
       const selectedCategory = categories.find(cat => cat.id === values.categoryId);
@@ -137,6 +142,20 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
     beforeUpload: handleImageUpload,
     showUploadList: false,
   };
+
+  // Verificar si el usuario está cargando o no existe
+  if (!user) {
+    return (
+      <Card>
+        <div style={{ textAlign: 'center', padding: '20px' }}>
+          <Spin size="large" />
+          <Text style={{ display: 'block', marginTop: '16px' }}>
+            Cargando datos del usuario...
+          </Text>
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card 
