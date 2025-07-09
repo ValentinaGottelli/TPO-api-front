@@ -9,7 +9,6 @@ import {
   Card,
   Space,
   Typography,
-  message,
   Row,
   Col,
   Image,
@@ -22,6 +21,7 @@ import {
   InboxOutlined
 } from '@ant-design/icons';
 import { useAuthRedux } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 import productService from '../../services/productService';
 import categoryService from '../../services/categoryService';
 
@@ -60,7 +60,14 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
       const categoriesData = await categoryService.getAllCategories();
       setCategories(categoriesData);
     } catch (error) {
-      message.error('Error al cargar categorías: ' + error.message);
+      toast.error('Error al cargar categorías: ' + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setCategories([]);
     }
   };
@@ -72,10 +79,24 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
       
       if (imageResponse && imageResponse.imageUrl) {
         setImageUrl(imageResponse.imageUrl);
-        message.success('Imagen subida exitosamente');
+        toast.success('¡Imagen subida exitosamente!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
-      message.error('Error al subir imagen: ' + error.message);
+      toast.error('Error al subir imagen: ' + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setImageLoading(false);
     }
@@ -85,11 +106,26 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
 
   const removeImage = () => {
     setImageUrl('');
+    toast.info('Imagen removida', {
+      position: "top-right",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
   };
 
   const handleSubmit = async (values) => {
     if (!user || !user.id) {
-      message.error('Error: Usuario no autenticado');
+      toast.error('Error: Usuario no autenticado', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
 
@@ -116,10 +152,10 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
       let result;
       if (product) {
         result = await productService.updateProduct(product.id, productData);
-        message.success('Producto actualizado exitosamente');
+        // No mostrar toast aquí, se mostrará en SellerDashboard
       } else {
         result = await productService.createProduct(productData);
-        message.success('Producto creado exitosamente');
+        // No mostrar toast aquí, se mostrará en SellerDashboard
       }
 
       form.resetFields();
@@ -129,7 +165,15 @@ const ProductForm = ({ product = null, onSuccess, onCancel }) => {
         onSuccess(result);
       }
     } catch (error) {
-      message.error('Error al guardar producto: ' + error.message);
+      const actionText = product ? 'actualizar' : 'crear';
+      toast.error(`Error al ${actionText} producto: ` + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setLoading(false);
     }
