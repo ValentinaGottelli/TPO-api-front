@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 import {
   Form,
   Input,
@@ -9,7 +10,6 @@ import {
   Typography,
   Space,
   Select,
-  message,
   Divider
 } from 'antd';
 import {
@@ -56,28 +56,46 @@ const Register = ({ onSwitchToLogin }) => {
       const result = await register(values);
       
       if (result.success) {
-        message.success('¡Registro exitoso! Bienvenido a Marketplace');
+        // Toast de éxito con información del rol
+        const roleText = values.role === 'VENDEDOR' ? 'vendedor' : 'comprador';
+        toast.success(`¡Registro exitoso! Bienvenido como ${roleText} a Marketplace`, {
+          position: "top-right",
+          autoClose: 4000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         
         // Redirect based on user role
         const redirectPath = getRedirectPath(result.data.role);
         navigate(redirectPath, { replace: true });
       } else {
-        message.error(result.error || 'Error al registrarse');
+        // Toast de error
+        toast.error(result.error || 'Error al registrarse', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
-      message.error('Error inesperado al registrarse');
+      // Toast de error inesperado
+      toast.error('Error inesperado al registrarse', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       console.error('Register error:', error);
     } finally {
       setLoading(false);
     }
   };
-
-  // Mostrar error de Redux si existe
-  useEffect(() => {
-    if (error) {
-      message.error(error);
-    }
-  }, [error]);
 
   return (
     <div style={{

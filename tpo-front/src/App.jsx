@@ -1,9 +1,12 @@
-// src/App.jsx - VERSIÓN FINAL (Sin CartProvider temporalmente)
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { store } from './store';
 import { initializeAuth } from './store/slices/authSlice';
+
+// React Toastify
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 // Componentes de autenticación
 import AuthPages from './components/auth/AuthPages';
@@ -161,6 +164,21 @@ function AppContent() {
           {/* Catch all - redirigir según autenticación */}
           <Route path="*" element={<RoleBasedRedirect />} />
         </Routes>
+
+        {/* Toast Container - Configuración global */}
+        <ToastContainer
+          position="top-right"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="light"
+          style={{ zIndex: 9999 }}
+        />
       </Router>
     // </CartProvider>
   );
