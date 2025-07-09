@@ -1,33 +1,35 @@
 // src/App.jsx - VERSIÓN FINAL (Sin CartProvider temporalmente)
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { store } from './store';
-import { initializeAuth } from './store/slices/authSlice';
+import React, { useEffect } from "react";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
+import { Provider, useDispatch, useSelector } from "react-redux";
+import { store } from "./store";
+import { initializeAuth } from "./store/slices/authSlice";
 
 // Componentes de autenticación
-import AuthPages from './components/auth/AuthPages';
-import LoadingScreen from './components/common/LoadingScreen';
+import AuthPages from "./components/auth/AuthPages";
+import LoadingScreen from "./components/common/LoadingScreen";
 
 // Componentes principales
-import GeneralDashboard from './components/dashboard/GeneralDashboard';
-import SellerDashboard from './components/seller/SellerDashboard';
+import GeneralDashboard from "./components/dashboard/GeneralDashboard";
+import SellerDashboard from "./components/seller/SellerDashboard";
 
 // Componentes de productos
-import ProductsList from './components/ProductsList';
-import ProductDetail from './components/ProductDetail';
+import ProductsList from "./components/ProductsList";
+import ProductDetail from "./components/ProductDetail";
 
-// Componentes de carrito y checkout (comentados temporalmente)
-// import Cart from './components/cart/Cart';
+import Cart from "./components/cart/Cart";
+import NotificationComponent from "./components/notification/Notification";
 // import CheckoutPage from './components/buyer/checkout/Checkout';
 // import CheckoutSuccessPage from './components/buyer/checkout/SuccessCheckout';
 
-// Context del carrito (comentado temporalmente)
-// import { CartProvider } from './context/CartContext';
-
 // Componente para rutas protegidas
 function ProtectedRoute({ children, allowedRoles = [] }) {
-  const auth = useSelector(state => state.auth);
+  const auth = useSelector((state) => state.auth);
 
   if (!auth.initialized || auth.loading) {
     return <LoadingScreen />;
@@ -37,7 +39,11 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
     return <Navigate to="/auth" replace />;
   }
 
-  if (allowedRoles.length > 0 && auth.user?.role && !allowedRoles.includes(auth.user.role)) {
+  if (
+    allowedRoles.length > 0 &&
+    auth.user?.role &&
+    !allowedRoles.includes(auth.user.role)
+  ) {
     return <Navigate to="/dashboard" replace />;
   }
 
@@ -46,7 +52,7 @@ function ProtectedRoute({ children, allowedRoles = [] }) {
 
 // Componente para redirigir según rol
 function RoleBasedRedirect() {
-  const auth = useSelector(state => state.auth);
+  const auth = useSelector((state) => state.auth);
 
   if (!auth.initialized || auth.loading) {
     return <LoadingScreen />;
@@ -74,7 +80,7 @@ function RoleBasedRedirect() {
 // Componente principal de la aplicación
 function AppContent() {
   const dispatch = useDispatch();
-  const auth = useSelector(state => state.auth);
+  const auth = useSelector((state) => state.auth);
 
   useEffect(() => {
     // Inicializar autenticación al cargar la app
@@ -90,44 +96,41 @@ function AppContent() {
 
   return (
     // Comentado temporalmente hasta que Redux funcione completamente
-    // <CartProvider>
-      <Router>
-        <Routes>
-          {/* Rutas de autenticación */}
-          <Route 
-            path="/auth" 
-            element={
-              auth.isAuthenticated ? <RoleBasedRedirect /> : <AuthPages />
-            } 
-          />
+    <Router>
+      <Routes>
+        {/* Rutas de autenticación */}
+        <Route
+          path="/auth"
+          element={auth.isAuthenticated ? <RoleBasedRedirect /> : <AuthPages />}
+        />
 
-          {/* Rutas para vendedores */}
-          <Route
-            path="/seller/*"
-            element={
-              <ProtectedRoute allowedRoles={["VENDEDOR"]}>
-                <SellerDashboard />
-              </ProtectedRoute>
-            }
-          />
+        {/* Rutas para vendedores */}
+        <Route
+          path="/seller/*"
+          element={
+            <ProtectedRoute allowedRoles={["VENDEDOR"]}>
+              <SellerDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Dashboard general (usuarios autenticados) */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <GeneralDashboard />
-              </ProtectedRoute>
-            }
-          />
+        {/* Dashboard general (usuarios autenticados) */}
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <GeneralDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-          {/* Rutas públicas de productos */}
-          <Route path="/products" element={<ProductsList />} />
-          <Route path="/products/:id" element={<ProductDetail />} />
+        {/* Rutas públicas de productos */}
+        <Route path="/products" element={<ProductsList />} />
+        <Route path="/products/:id" element={<ProductDetail />} />
 
-          {/* Rutas del carrito (comentadas temporalmente) */}
-          {/*
-          <Route path="/cart" element={<Cart />} />
+        {/* Rutas del carrito (comentadas temporalmente) */}
+        <Route path="/cart" element={<Cart />} />
+        {/*
           <Route
             path="/checkout"
             element={
@@ -146,23 +149,22 @@ function AppContent() {
           />
           */}
 
-          {/* Rutas temporales de carrito para evitar errores */}
-          <Route path="/cart" element={
+        {/* Rutas temporales de carrito para evitar errores */}
+        {/* <Route path="/cart" element={
             <div style={{ padding: '20px', textAlign: 'center' }}>
               <h2>🛒 Carrito (Temporalmente deshabilitado)</h2>
               <p>El carrito estará disponible una vez que se complete la migración a Redux.</p>
               <button onClick={() => window.history.back()}>← Volver</button>
             </div>
-          } />
+          } /> */}
 
-          {/* Ruta raíz - redirigir según autenticación */}
-          <Route path="/" element={<RoleBasedRedirect />} />
+        {/* Ruta raíz - redirigir según autenticación */}
+        <Route path="/" element={<RoleBasedRedirect />} />
 
-          {/* Catch all - redirigir según autenticación */}
-          <Route path="*" element={<RoleBasedRedirect />} />
-        </Routes>
-      </Router>
-    // </CartProvider>
+        {/* Catch all - redirigir según autenticación */}
+        <Route path="*" element={<RoleBasedRedirect />} />
+      </Routes>
+    </Router>
   );
 }
 
@@ -170,6 +172,7 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
+      <NotificationComponent />
       <AppContent />
     </Provider>
   );

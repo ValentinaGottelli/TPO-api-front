@@ -9,7 +9,7 @@ import {
 } from "@ant-design/icons";
 const { Title } = Typography;
 const { Content } = Layout;
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import Navbar from "../common/Navbar";
 
 const styles = {
@@ -22,12 +22,12 @@ const styles = {
 export const Cart = () => {
   const {
     cart,
+    totalPrice,
     addToCart,
     subtractToCart,
     updateCart,
     removeFromCart,
-    getTotalPriceCart,
-  } = useCart([]);
+  } = useCart();
   const navigate = useNavigate();
 
   const handleFinalizarCompraClick = () => {
@@ -46,9 +46,16 @@ export const Cart = () => {
           <Title>Mi carrito</Title>
 
           {cart.length === 0 ? (
-            <Title style={{ textAlign: "center" }}>
-              Su carrito está vacio <FrownOutlined />
-            </Title>
+            <>
+              <Title style={{ textAlign: "center" }}>
+                Su carrito está vacio <FrownOutlined />
+              </Title>
+              <Flex justify="center" align="center">
+                <Button onClick={() => handleContinuarComprandoClick()}>
+                  CONTINUAR COMPRANDO
+                </Button>
+              </Flex>
+            </>
           ) : (
             <>
               <Flex gap="middle" vertical>
@@ -119,9 +126,7 @@ export const Cart = () => {
                 >
                   <Flex justify="space-between">
                     <h2 className="total-title">Total</h2>
-                    <h2 className="total-price">
-                      $ {getTotalPriceCart().toFixed(2)}
-                    </h2>
+                    <h2 className="total-price">$ {totalPrice?.toFixed(2)}</h2>
                   </Flex>
                   <Button
                     onClick={() => handleFinalizarCompraClick()}

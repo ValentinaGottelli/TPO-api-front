@@ -1,14 +1,14 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
-import { useAuth } from "../../context/AuthContext";
-import { useCart } from "../../context/CartContext";
+import { useAuthRedux } from "../../hooks/useAuth";
+import { useCart } from "../../hooks/useCart";
 import "./Navbar.css";
 
 // si en un futuro agregamos searchbar, cambiar a true
 const Navbar = ({ shouldShowSearchbar = false, shouldShowCart = true }) => {
-  const { user, isAuthenticated } = useAuth();
-  const { cart, handleCartClick } = useCart([]);
+  const { user, isAuthenticated } = useAuthRedux();
+  const { cart, handleCartClick } = useCart();
   const navigate = useNavigate();
 
   const handleUserClick = () => {
