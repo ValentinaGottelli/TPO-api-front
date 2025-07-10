@@ -1,4 +1,3 @@
-// src/store/index.js
 import { configureStore } from '@reduxjs/toolkit';
 import authSlice from './slices/authSlice';
 
@@ -13,3 +12,7 @@ export const store = configureStore({
       },
     }),
 });
+
+if (typeof window !== 'undefined') {
+  window.__REDUX_STORE__ = store;
+}
