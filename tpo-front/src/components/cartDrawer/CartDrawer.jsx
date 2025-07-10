@@ -1,5 +1,6 @@
+import "./CartDrawer.css";
 import { useEffect } from "react";
-import { useCart } from "../../context/CartContext";
+import { useCart } from "../../hooks/useCart";
 import { Space, Button, Drawer, Flex, Typography } from "antd";
 const { Title } = Typography;
 
@@ -10,7 +11,6 @@ import {
   FrownOutlined,
 } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 
 export const CartDrawer = () => {
   const {
@@ -20,8 +20,8 @@ export const CartDrawer = () => {
     addToCart,
     subtractToCart,
     removeFromCart,
-    loadCart
-  } = useCart([]);
+    loadCart,
+  } = useCart();
   const navigate = useNavigate();
 
   const navigateToCart = () => {
@@ -60,24 +60,32 @@ export const CartDrawer = () => {
           ) : (
             cart.map((c) => {
               return (
-                <Flex justify="space-between" align="center" key={c.id}>
-                  <Flex align="center">{c.name}</Flex>
-                  <Flex gap="middle" align="center">
-                    <Button
-                      onClick={() => subtractToCart(c)}
-                      icon={<MinusOutlined />}
-                    />
-                    {c.cartQuantity}
-                    <Button
-                      onClick={() => addToCart(c)}
-                      icon={<PlusOutlined />}
-                    />
-                    <Button
-                      onClick={() => removeFromCart(c)}
-                      icon={<DeleteOutlined />}
-                      type="primary"
-                      danger
-                    />
+                <Flex align="center" key={c.id} gap="small">
+                  <Flex>
+                    <div className="cart-image-drawer">
+                      <img src={c.imageUrl} alt={c.name} />
+                    </div>
+                  </Flex>
+                  <Flex vertical gap="small" className="flex-grow">
+                    <Flex align="center">{c.name}</Flex>
+                    <Flex gap="small" align="center">
+                      <Button
+                        onClick={() => subtractToCart(c)}
+                        icon={<MinusOutlined />}
+                      />
+                      {c.cartQuantity}
+                      <Button
+                        onClick={() => addToCart(c)}
+                        icon={<PlusOutlined />}
+                      />
+                      <Button
+                        onClick={() => removeFromCart(c)}
+                        icon={<DeleteOutlined />}
+                        type="primary"
+                        danger
+                      />
+                    </Flex>
+                    <h2>$ {(c.price * c.cartQuantity).toFixed(2)}</h2>
                   </Flex>
                 </Flex>
               );

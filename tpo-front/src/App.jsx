@@ -1,15 +1,15 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router } from 'react-router-dom';
-import { Provider, useDispatch } from 'react-redux';
-import { store } from './store';
-import { initializeAuth } from './store/slices/authSlice';
-import { useAuthRedux } from './hooks/useAuth';
+import React, { useEffect } from "react";
+import { BrowserRouter as Router } from "react-router-dom";
+import { Provider, useDispatch } from "react-redux";
+import { store } from "./store";
+import { initializeAuth } from "./store/slices/authSlice";
+import { useAuthRedux } from "./hooks/useAuth";
 
 // Componentes
-import AppRoutes from './routes/AppRoutes';
-import LoadingScreen from './components/common/LoadingScreen';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import AppRoutes from "./routes/AppRoutes";
+import LoadingScreen from "./components/common/LoadingScreen";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Componente interno que maneja la inicializacion
 function AppContent() {
@@ -38,8 +38,9 @@ function AppContent() {
 function App() {
   return (
     <Provider store={store}>
+      <NotificationComponent />
       <AppContent />
-      
+
       {/* Config global de Toast */}
       <ToastContainer
         position="top-right"

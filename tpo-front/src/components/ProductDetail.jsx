@@ -8,7 +8,7 @@ import Error from "./common/Error";
 import "./ProductDetail.css";
 import LoadingScreen from "./common/LoadingScreen";
 import CartDrawer from "./cartDrawer/cartDrawer";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 
 const { Title, Text } = Typography;
 
@@ -18,7 +18,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { addToCart } = useCart([]);
+  const { addToCart } = useCart();
 
   useEffect(() => {
     const loadProduct = async () => {
