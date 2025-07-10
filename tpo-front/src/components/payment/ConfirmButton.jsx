@@ -1,9 +1,12 @@
 import React from 'react';
 import { Card, Button, Space, Form } from 'antd';
 import { CreditCardOutlined, DollarOutlined } from '@ant-design/icons';
+import { useNotification } from '../../hooks/useNotification';
 import './Payment.css';
 
 const ConfirmButton = ({ paymentMethod, loading, handleGoBack, handleSubmit, form, styles, cartEmpty }) => {
+    const { toast } = useNotification();
+    
     const handleClick = async () => {
         if (cartEmpty) return;
 
@@ -12,6 +15,11 @@ const ConfirmButton = ({ paymentMethod, loading, handleGoBack, handleSubmit, for
             await handleSubmit(values);
         } catch (error) {
             console.error('Error en validación del formulario:', error);
+            // Mostrar toast cuando falle la validación
+            toast({
+                message: "Por favor completa toda la información",
+                description: "Revisa que todos los campos obligatorios estén completos antes de continuar."
+            });
         }
     };
 
