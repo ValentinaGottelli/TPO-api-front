@@ -1,4 +1,3 @@
-// src/components/auth/Login.jsx (versión Redux con Toast)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '../../hooks/useAuth';
@@ -39,7 +38,7 @@ const Login = ({ onSwitchToRegister }) => {
     }
   }, [error, clearError]);
 
-  // Redirigir si ya está autenticado
+  // Redirigir si ya esta autenticado
   useEffect(() => {
     if (isAuthenticated) {
       const redirectPath = getRedirectPath();
@@ -53,7 +52,7 @@ const Login = ({ onSwitchToRegister }) => {
       const result = await login(values);
       
       if (result.success) {
-        // Toast de éxito
+        // Toast de exito
         toast.success('¡Inicio de sesión exitoso!', {
           position: "top-right",
           autoClose: 3000,
