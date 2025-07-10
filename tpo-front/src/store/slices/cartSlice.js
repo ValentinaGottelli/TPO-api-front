@@ -124,10 +124,15 @@ export const selectCartDrawer = (state) => state.cart.cartDrawer;
 export const selectCartLoading = (state) => state.cart.loading;
 export const selectCartError = (state) => state.cart.error;
 
-export const selectCartTotalPrice = (state) =>
-  state.cart.cart.reduce(
+export const selectCartTotalPrice = (state) => {
+  const cart = state.cart.cart;
+  if (!Array.isArray(cart)) {
+    return 0;
+  }
+  return cart.reduce(
     (acc, product) => acc + product.cartQuantity * product.price,
     0
   );
+};
 
 export default cartSlice.reducer;
