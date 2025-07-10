@@ -38,7 +38,7 @@ const styles = {
 
 const CheckoutPage = () => {
   const { user } = useAuthRedux();
-  const { confirmCheckout, loading, error, response } = useCheckoutRedux();
+  const { loading, error } = useCheckoutRedux();
   const { cart, prodError } = useGetCartRedux();
   const navigate = useNavigate();
 
@@ -49,13 +49,7 @@ const CheckoutPage = () => {
   }, [error, prodError]);
 
   const handleCheckout = async () => {
-    const result = await confirmCheckout();
-    if (result) {
-      navigate("/checkout/success");
-    } else if (error) {
-      console.error("ERROR DEL CHECKOUT", error);
-      message.error("Ocurrió un error");
-    }
+    navigate("/payment")
   };
 
   const navHome = () => {
@@ -111,7 +105,7 @@ const CheckoutPage = () => {
                     disabled={loading}
                     onClick={handleCheckout}
                   >
-                    Confirmar Pago
+                    Pagar
                   </Button>
                 ) : (
                   <></>
