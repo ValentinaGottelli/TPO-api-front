@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, Form, Input, Space } from 'antd';
 import { CreditCardOutlined } from '@ant-design/icons';
+import { VisaLogo, MasterCardLogo, AmexLogo } from './cardLogos';
 import './Payment.css';
 
 const CreditCard = ({ paymentMethod, form, styles }) => {
@@ -53,6 +54,22 @@ const CreditCard = ({ paymentMethod, form, styles }) => {
                                 {cardTypeAndColor.type || 'TARJETA'}
                             </div>
                             <div className="credit-card-chip"></div>
+                            {/* Logos de tarjetas en la esquina superior derecha */}
+                            {cardTypeAndColor.type === 'Visa' && (
+                                <div className="credit-card-logo">
+                                    <VisaLogo />
+                                </div>
+                            )}
+                            {cardTypeAndColor.type === 'MasterCard' && (
+                                <div className="credit-card-logo">
+                                    <MasterCardLogo />
+                                </div>
+                            )}
+                            {cardTypeAndColor.type === 'Amex' && (
+                                <div className="credit-card-logo">
+                                    <AmexLogo />
+                                </div>
+                            )}
                         </div>
 
                         <div className="credit-card-number">
@@ -107,6 +124,7 @@ const CreditCard = ({ paymentMethod, form, styles }) => {
                 <Form.Item
                     label="Número de tarjeta"
                     name="cardNumber"
+                    validateTrigger="onBlur"
                     rules={[
                         { required: true, message: 'Por favor ingresa el número de tarjeta' },
                         {
@@ -138,6 +156,7 @@ const CreditCard = ({ paymentMethod, form, styles }) => {
                     <Form.Item
                         label="Fecha de vencimiento"
                         name="expiryDate"
+                        validateTrigger="onBlur"
                         rules={[
                             { required: true, message: 'Ingresa la fecha de vencimiento' },
                             { pattern: /^\d{2}\/\d{2}$/, message: 'Formato: MM/AA' }
@@ -159,6 +178,7 @@ const CreditCard = ({ paymentMethod, form, styles }) => {
                     <Form.Item
                         label="CVV"
                         name="cvv"
+                        validateTrigger="onBlur"
                         rules={[
                             { required: true, message: 'Ingresa el CVV' },
                             { pattern: /^\d{3,4}$/, message: 'CVV debe tener 3 o 4 dígitos' }
@@ -183,15 +203,18 @@ const CreditCard = ({ paymentMethod, form, styles }) => {
                 <Form.Item
                     label="Nombre en la tarjeta"
                     name="cardholderName"
+                    validateTrigger="onBlur"
                     rules={[
-                        { required: true, message: 'Ingresa el nombre del titular' }
+                        { required: true, message: 'Ingresa el nombre del titular' },
+                        { pattern: /^[a-zA-ZÀ-ÿ\s]+$/, message: 'El nombre solo puede contener letras y espacios' }
                     ]}
                 >
                     <Input
                         placeholder="Nombre completo"
                         value={cardName}
                         onChange={(e) => {
-                            const value = e.target.value.toUpperCase();
+                            // Solo permitir letras, espacios y caracteres especiales (acentos, ñ, etc.)
+                            const value = e.target.value.replace(/[^a-zA-ZÀ-ÿ\s]/g, '').toUpperCase();
                             setCardName(value);
                             form.setFieldsValue({ cardholderName: value });
                         }}
