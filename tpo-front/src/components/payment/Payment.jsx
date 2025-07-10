@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Layout, Form, message, Row, Col } from 'antd';
 import { useNavigate } from 'react-router-dom';
-import { useCart } from '../../../context/CartContext';
-import useCheckoutRedux from '../checkout/useCheckout';
-import { useNotification } from '../../../hooks/useNotification';
+import { useCart } from '../../hooks/useCart';
+import { useCheckoutRedux } from '../buyer/checkout/useCheckout';
+import { useNotification } from '../../hooks/useNotification';
 import PaymentMethod from './PaymentMethod';
 import ShippingAddress from './ShippingAddress';
 import Summary from './Summary';
 import ConfirmButton from './ConfirmButton';
 import CreditCard from './CreditCard';
 import CashMethod from './CashMethod';
-import Navbar from '../../common/Navbar';
+import Navbar from '../common/Navbar';
 import './Payment.css';
 
 const { Content } = Layout;
@@ -31,6 +31,11 @@ const Payment = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
     const [paymentMethod, setPaymentMethod] = useState('credit-card');
+
+    // Cargar el carrito cuando se monta el componente
+    useEffect(() => {
+        loadCart();
+    }, [loadCart]);
 
     const handleSubmit = async (values) => {
         setLoading(true);
