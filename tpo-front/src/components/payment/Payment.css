@@ -84,6 +84,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    position: relative;
 }
 
 .credit-card-type {
@@ -97,6 +98,25 @@
     height: 25px;
     background: rgba(255, 255, 255, 0.3);
     border-radius: 4px;
+}
+
+.credit-card-logo {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 10;
+}
+
+.mastercard-logo {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.amex-logo {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.visa-logo {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
 }
 
 .credit-card-number {
