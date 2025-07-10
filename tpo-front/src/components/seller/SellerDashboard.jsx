@@ -10,7 +10,6 @@ import {
   Row,
   Col,
   Modal,
-  message,
   Tag,
   Image,
   Popconfirm,
@@ -28,6 +27,7 @@ import {
   BarChartOutlined
 } from '@ant-design/icons';
 import { useAuthRedux } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 import productService from '../../services/productService';
 import ProductForm from './ProductForm';
 
@@ -59,7 +59,14 @@ const SellerDashboard = () => {
       const userProducts = await productService.getUserProducts(user.id);
       setProducts(userProducts || []);
     } catch (error) {
-      message.error('Error al cargar productos: ' + error.message);
+      toast.error('Error al cargar productos: ' + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       setProducts([]);
     } finally {
       setLoading(false);
@@ -78,25 +85,68 @@ const SellerDashboard = () => {
 
   const handleDeleteProduct = async (productId) => {
     if (!user || !user.id) {
-      message.error('Error: Usuario no autenticado');
+      toast.error('Error: Usuario no autenticado', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       return;
     }
 
     setDeleteLoading(productId);
     try {
       await productService.deleteProduct(productId, user.id);
-      message.success('Producto eliminado exitosamente');
+      toast.success('¡Producto eliminado exitosamente!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       await loadUserProducts();
     } catch (error) {
-      message.error('Error al eliminar producto: ' + error.message);
+      toast.error('Error al eliminar producto: ' + error.message, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     } finally {
       setDeleteLoading(null);
     }
   };
 
-  const handleProductFormSuccess = async () => {
+  const handleProductFormSuccess = async (result) => {
     setShowProductForm(false);
     setEditingProduct(null);
+    
+    // Toast personalizado según si fue creación o edición
+    if (editingProduct) {
+      toast.success('¡Producto actualizado exitosamente!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    } else {
+      toast.success('¡Producto creado exitosamente!', {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+    }
+    
     await loadUserProducts();
   };
 
@@ -107,6 +157,14 @@ const SellerDashboard = () => {
 
   const handleLogout = async () => {
     try {
+      toast.info('Cerrando sesión...', {
+        position: "top-right",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       await logout();
     } catch (error) {
       console.error('Logout error:', error);
@@ -280,7 +338,7 @@ const SellerDashboard = () => {
                   value={totalValue}
                   prefix={<DollarOutlined />}
                   valueStyle={{ color: '#52c41a' }}
-                  formatter={(value) => `${value.toLocaleString()}`}
+                  formatter={(value) => `$${value.toLocaleString()}`}
                 />
               </Card>
             </Col>

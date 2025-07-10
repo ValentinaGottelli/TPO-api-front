@@ -8,7 +8,7 @@ import Error from "./common/Error";
 import productService from "../services/productService";
 import LoadingScreen from "./common/LoadingScreen";
 import CartDrawer from "./cartDrawer/cartDrawer";
-import { useCart } from "../context/CartContext";
+import { useCart } from "../hooks/useCart";
 
 export const ProductsList = () => {
   const navigate = useNavigate();
@@ -18,7 +18,7 @@ export const ProductsList = () => {
   const [error, setError] = useState(null);
   const [total, setTotal] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const { addToCart } = useCart([]);
+  const { addToCart } = useCart();
   const productsPerPage = 10;
 
   const loadProducts = async (categoryId = null) => {
@@ -103,24 +103,26 @@ export const ProductsList = () => {
         selectedCategory={selectedCategory}
       />
       <div className="products-grid">
-  {products
-    .filter(product => product.quantity > 0)
-    .map(product => (
-      <div 
-        key={product.id} 
-        className="product-card"
-        onClick={() => handleProductClick(product.id)}
-      >
-        <div className="product-image">
-          <img src={product.imageUrl} alt={product.name} />
-        </div>
-        <h2>{product.name}</h2>
-        <div className="price">${product.price.toFixed(2)}</div>
-        <div className="category">{product.category.name}</div>
-        <div className="quantity">Stock disponible: {product.quantity}</div>
+        {products
+          .filter((product) => product.quantity > 0)
+          .map((product) => (
+            <div
+              key={product.id}
+              className="product-card"
+              onClick={() => handleProductClick(product.id)}
+            >
+              <div className="product-image">
+                <img src={product.imageUrl} alt={product.name} />
+              </div>
+              <h2>{product.name}</h2>
+              <div className="price">${product.price.toFixed(2)}</div>
+              <div className="category">{product.category.name}</div>
+              <div className="quantity">
+                Stock disponible: {product.quantity}
+              </div>
+            </div>
+          ))}
       </div>
-    ))}
-</div>
       <div className="pagination-container">
         <Pagination
           current={currentPage}

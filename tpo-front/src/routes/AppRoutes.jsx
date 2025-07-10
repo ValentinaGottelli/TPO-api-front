@@ -1,12 +1,17 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuthRedux } from "../hooks/useAuth";
+
+import AuthGuard from "../components/auth/AuthGuard";
+import LoadingScreen from "../components/common/LoadingScreen";
+
 import AuthPages from "../components/auth/AuthPages";
 import GeneralDashboard from "../components/dashboard/GeneralDashboard";
 import SellerDashboard from "../components/seller/SellerDashboard";
-import LoadingScreen from "../components/common/LoadingScreen";
+
 import ProductsList from "../components/ProductsList";
 import ProductDetail from "../components/ProductDetail";
+
 import Cart from "../components/cart/Cart";
 import CheckoutPage from "../components/buyer/checkout/Checkout";
 import CheckoutSuccessPage from "../components/buyer/checkout/SuccessCheckout";
@@ -40,7 +45,6 @@ function RoleBasedRedirect() {
 function AppRoutes() {
   return (
     <Routes>
-      {/* Rutas públicas de autenticación */}
       <Route 
         path="/auth" 
         element={
@@ -50,7 +54,6 @@ function AppRoutes() {
         } 
       />
       
-      {/* Rutas para vendedores */}
       <Route
         path="/seller/*"
         element={
@@ -60,7 +63,6 @@ function AppRoutes() {
         }
       />
       
-      {/* Dashboard general (todos los usuarios autenticados) */}
       <Route
         path="/dashboard"
         element={
@@ -70,11 +72,9 @@ function AppRoutes() {
         }
       />
       
-      {/* Rutas públicas de productos */}
       <Route path="/products" element={<ProductsList />} />
       <Route path="/products/:id" element={<ProductDetail />} />
       
-      {/* Rutas del carrito */}
       <Route path="/cart" element={<Cart />} />
       <Route 
         path="/checkout" 
@@ -93,10 +93,7 @@ function AppRoutes() {
         } 
       />
       
-      {/* Ruta raíz - redirigir según autenticación */}
       <Route path="/" element={<RoleBasedRedirect />} />
-      
-      {/* Catch all - redirigir según autenticación */}
       <Route path="*" element={<RoleBasedRedirect />} />
     </Routes>
   );

@@ -1,12 +1,6 @@
 import api from './api';
 
-const STORAGE_KEYS = {
-  TOKEN: 'access_token',
-  USER: 'marketplace_user'
-};
-
 const authService = {
-  // Login - retorna datos limpios para Redux
   login: async (credentials) => {
     try {
       const loginData = {
@@ -17,162 +11,97 @@ const authService = {
       const response = await api.post('/user/authenticate', loginData);
       const { access_token, user } = response.data;
       
-      // Guardar en localStorage
-      if (access_token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, access_token);
+      if (!access_token || !user) {
+        throw new Error('Datos de usuario inválidos');
       }
       
-      if (user) {
-        const userData = {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          lastName: user.lastName,
-          role: user.role || 'COMPRADOR'
-        };
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
-        
-        // Retornar datos estructurados para Redux
-        return {
-          user: userData,
-          access_token,
-          success: true
-        };
-      }
+      const userData = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        lastName: user.lastName,
+        role: user.role || 'COMPRADOR'
+      };
       
-      throw new Error('Datos de usuario inválidos');
+      return {
+        user: userData,
+        token: access_token,
+        success: true
+      };
+      
     } catch (error) {
       throw authService._handleError(error);
     }
   },
 
-  // Register - retorna datos limpios para Redux
   register: async (userData) => {
     try {
       const response = await api.post('/user/register', userData);
       const { access_token, user } = response.data;
       
-      // Guardar en localStorage
-      if (access_token) {
-        localStorage.setItem(STORAGE_KEYS.TOKEN, access_token);
+      if (!access_token || !user) {
+        throw new Error('Datos de usuario inválidos');
       }
       
-      if (user) {
-        const userDataToStore = {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          lastName: user.lastName,
-          role: user.role || userData.role || 'COMPRADOR'
-        };
-        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userDataToStore));
-        
-        // Retornar datos estructurados para Redux
-        return {
-          user: userDataToStore,
-          access_token,
-          success: true
-        };
-      }
+      const userDataToReturn = {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        lastName: user.lastName,
+        role: user.role || userData.role || 'COMPRADOR'
+      };
       
-      throw new Error('Datos de usuario inválidos');
+      return {
+        user: userDataToReturn,
+        token: access_token,
+        success: true
+      };
+      
     } catch (error) {
       throw authService._handleError(error);
     }
   },
 
-  // Logout - limpia todo
   logout: async () => {
     try {
-      const token = authService.getToken();
-      if (token) {
-        await api.post('/user/logout');
-      }
+      await api.post('/user/logout');
     } catch (error) {
-      // Ignore logout errors pero limpiar storage
-    } finally {
-      authService.clearStorage();
+      console.warn('Error durante logout:', error.message);
     }
   },
 
-  // Verificar si hay datos de autenticación válidos
-  // En authService.js debe estar este método:
-checkAuthState: () => {
-  try {
-    const token = authService.getToken();
-    const user = authService.getCurrentUser();
-    
-    if (user && user.id && user.email) {
-      return {
-        isAuthenticated: true,
-        user,
-        token
-      };
-    }
-    
-    authService.clearStorage();
-    return {
-      isAuthenticated: false,
-      user: null,
-      token: null
-    };
-  } catch (error) {
-    authService.clearStorage();
-    return {
-      isAuthenticated: false,
-      user: null,
-      token: null
-    };
-  }
-},
-
-  // Funciones de utilidad
-  getToken: () => localStorage.getItem(STORAGE_KEYS.TOKEN),
-  
-  getCurrentUser: () => {
+  verifyToken: async (token) => {
     try {
-      const userStr = localStorage.getItem(STORAGE_KEYS.USER);
-      if (!userStr) return null;
+      const originalAuth = api.defaults.headers.common['Authorization'];
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      const user = JSON.parse(userStr);
-      if (user && user.id && user.email) {
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name || '',
-          lastName: user.lastName || '',
-          role: user.role || 'COMPRADOR'
-        };
+      const response = await api.get('/user/verify');
+      
+      if (originalAuth) {
+        api.defaults.headers.common['Authorization'] = originalAuth;
+      } else {
+        delete api.defaults.headers.common['Authorization'];
       }
-      return null;
+      
+      return response.data;
     } catch (error) {
-      return null;
+      delete api.defaults.headers.common['Authorization'];
+      throw authService._handleError(error);
     }
   },
 
-  updateUser: (userData) => {
-    try {
-      const userToStore = {
-        id: userData.id,
-        email: userData.email,
-        name: userData.name,
-        lastName: userData.lastName,
-        role: userData.role || 'COMPRADOR'
-      };
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userToStore));
-      return userToStore;
-    } catch (error) {
-      return null;
+  setAuthToken: (token) => {
+    if (token) {
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    } else {
+      delete api.defaults.headers.common['Authorization'];
     }
   },
 
-  clearStorage: () => {
-    Object.values(STORAGE_KEYS).forEach(key => {
-      localStorage.removeItem(key);
-    });
+  removeAuthToken: () => {
+    delete api.defaults.headers.common['Authorization'];
   },
 
-  // Verificaciones de rol
   hasRole: (userRole, requiredRole) => {
     if (!userRole || !requiredRole) return false;
     

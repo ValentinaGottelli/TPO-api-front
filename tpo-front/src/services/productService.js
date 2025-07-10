@@ -48,19 +48,18 @@ const productService = {
     }
   },
 
-  // Obtener productos del usuario (sin filtrar por ahora, ya que no viene userId en la respuesta)
+
   getUserProducts: async (userId) => {
-    try {
-      const response = await api.get('/products');
-      const allProducts = response.data.products || [];
-      
-      // Por ahora retornamos todos los productos
-      // TODO: El backend debería devolver userId en cada producto para filtrar correctamente
-      return allProducts;
-    } catch (error) {
-      throw productService._handleError(error);
-    }
-  },
+  try {
+    const response = await api.get(`/products/user/${userId}`);
+    
+    const userProducts = response.data.products || [];
+    
+    return userProducts;
+  } catch (error) {
+    throw productService._handleError(error);
+  }
+},
 
   // Actualizar producto
   updateProduct: async (productId, productData) => {

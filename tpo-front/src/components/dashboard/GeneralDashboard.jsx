@@ -17,9 +17,9 @@ import {
   ShopOutlined,
   CrownOutlined,
 } from "@ant-design/icons";
-import { useAuth } from "../../context/AuthContext";
 import RoleSelector from "../common/RoleSelector";
 import { useNavigate } from "react-router-dom";
+import { useAuthRedux } from "../../hooks/useAuth";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
@@ -48,7 +48,7 @@ const styles = {
 };
 
 function GeneralDashboard() {
-  const { user, logout } = useAuth();
+  const { user, logout } = useAuthRedux();
   const navigate = useNavigate();
 
   const getRoleDisplay = (role) => {
