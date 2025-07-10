@@ -93,12 +93,17 @@ export const useCart = () => {
     };
   };
 
+  const getTotalPriceCart = useCallback(() => {
+    return totalPrice;
+  }, [totalPrice]);
+
   return {
     cart,
     cartDrawer,
     loading,
     error,
     totalPrice,
+    getTotalPriceCart,
     loadCart,
     addToCart,
     subtractToCart,

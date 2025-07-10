@@ -15,6 +15,8 @@ import ProductDetail from "../components/ProductDetail";
 import Cart from "../components/cart/Cart";
 import CheckoutSuccessPage from "../components/buyer/checkout/SuccessCheckout";
 import CheckoutPage from "../components/buyer/checkout/Checkout";
+import Payment from "../components/payment/Payment";
+
 
 function RoleBasedRedirect() {
   const { user, isAuthenticated, loading, initialized } = useAuthRedux();
@@ -84,6 +86,14 @@ function AppRoutes() {
           </AuthGuard>
         } 
       />
+      <Route
+        path="/payment"
+        element={
+          <AuthGuard requireAuth={true}>
+            <Payment />
+            </AuthGuard>
+        }
+      /> 
       <Route 
         path="/checkout/success" 
         element={

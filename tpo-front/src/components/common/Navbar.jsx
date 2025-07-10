@@ -4,12 +4,17 @@ import { UserOutlined, ShoppingCartOutlined } from "@ant-design/icons";
 import { useAuthRedux } from "../../hooks/useAuth";
 import { useCart } from "../../hooks/useCart";
 import "./Navbar.css";
+import Title from "antd/es/typography/Title";
+
 
 // si en un futuro agregamos searchbar, cambiar a true
 const Navbar = ({ shouldShowSearchbar = false, shouldShowCart = true }) => {
   const { user, isAuthenticated } = useAuthRedux();
   const { cart, handleCartClick } = useCart();
   const navigate = useNavigate();
+  const handleMarketIconClick = () => {
+    navigate("/");
+  };
 
   const handleUserClick = () => {
     navigate("/");
@@ -22,6 +27,13 @@ const Navbar = ({ shouldShowSearchbar = false, shouldShowCart = true }) => {
           <input type="text" placeholder="Buscar producto" />
         </form>
       )}
+      <Title
+        level={3}
+        style={{ color: "black", margin: 0, cursor: "pointer" }}
+        onClick={handleMarketIconClick}
+      >
+        🏪 Marketplace
+      </Title> 
       <div
         className={`nav-actions ${
           !shouldShowSearchbar ? "nav-actions-centered" : ""
