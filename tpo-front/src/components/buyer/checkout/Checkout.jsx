@@ -13,9 +13,10 @@ import {
   message,
 } from "antd";
 import { ShoppingCartOutlined, CreditCardOutlined } from "@ant-design/icons";
-import useCheckout, { useCheckoutRedux } from "../checkout/useCheckout";
+import { useCheckoutRedux } from "../checkout/useCheckout";
 import { useGetCartRedux } from "./useGetCart";
 import { useNavigate } from "react-router-dom";
+import { useAuthRedux } from "../../../hooks/useAuth";
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;

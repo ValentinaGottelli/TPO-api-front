@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react"
-import { fetchCart } from '../../store/slices/cartSlice';
+import { useEffect, useState } from "react"
+import { fetchCart } from '../../../store/slices/cartSlice.js';
 import { useDispatch, useSelector } from 'react-redux';
 import cartService  from '../../../services/cartService'
 
