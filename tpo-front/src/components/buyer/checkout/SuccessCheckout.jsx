@@ -1,5 +1,6 @@
 import { Button, Result } from 'antd';
 import { useNavigate } from 'react-router-dom';
+import Navbar from '../../common/Navbar';
 
 const CheckoutSuccessPage = () => {
   const navigate = useNavigate();
@@ -9,6 +10,8 @@ const CheckoutSuccessPage = () => {
   };
 
   return (
+    <>
+    <Navbar shouldShowCart={false} />
     <div style={{ 
         padding: '60px 20px', 
         display: 'flex', 
@@ -22,7 +25,8 @@ const CheckoutSuccessPage = () => {
           borderRadius: 12, 
           boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)', 
           maxWidth: 600, 
-          width: '100%' 
+          width: '100%',
+          height: 'fit-content'
         }}>
           <Result
             status="success"
@@ -36,6 +40,7 @@ const CheckoutSuccessPage = () => {
           />
         </div>
       </div>
+      </>
   );
 };
 
