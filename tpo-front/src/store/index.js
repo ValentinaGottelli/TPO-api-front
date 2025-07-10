@@ -16,3 +16,7 @@ export const store = configureStore({
       },
     }),
 });
+
+if (typeof window !== "undefined") {
+  window.__REDUX_STORE__ = store;
+}

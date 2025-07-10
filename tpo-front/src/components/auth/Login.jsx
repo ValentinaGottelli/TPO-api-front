@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthRedux } from '../../hooks/useAuth';
+import { toast } from 'react-toastify';
 import {
   Form,
   Input,
@@ -8,7 +9,6 @@ import {
   Card,
   Typography,
   Space,
-  message,
   Divider
 } from 'antd';
 import {
@@ -38,7 +38,7 @@ const Login = ({ onSwitchToRegister }) => {
     }
   }, [error, clearError]);
 
-  // Redirigir si ya está autenticado
+  // Redirigir si ya esta autenticado
   useEffect(() => {
     if (isAuthenticated) {
       const redirectPath = getRedirectPath();
@@ -52,28 +52,45 @@ const Login = ({ onSwitchToRegister }) => {
       const result = await login(values);
       
       if (result.success) {
-        message.success('¡Inicio de sesión exitoso!');
+        // Toast de exito
+        toast.success('¡Inicio de sesión exitoso!', {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
         
         // Redirect based on user role
         const redirectPath = getRedirectPath(result.data.role);
         navigate(redirectPath, { replace: true });
       } else {
-        message.error(result.error || 'Error al iniciar sesión');
+        // Toast de error
+        toast.error(result.error || 'Error al iniciar sesión', {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
-      message.error('Error inesperado al iniciar sesión');
+      // Toast de error inesperado
+      toast.error('Error inesperado al iniciar sesión', {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
       console.error('Login error:', error);
     } finally {
       setLoading(false);
     }
   };
-
-  // Mostrar error de Redux si existe
-  useEffect(() => {
-    if (error) {
-      message.error(error);
-    }
-  }, [error]);
 
   return (
     <div style={{
