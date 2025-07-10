@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react"
+import { fetchCart } from '../../../store/slices/cartSlice.js';
+import { useDispatch, useSelector } from 'react-redux';
 import cartService  from '../../../services/cartService'
 
 const useGetCart = () => {
@@ -24,3 +26,14 @@ const useGetCart = () => {
 };
  
 export default useGetCart
+
+export const useGetCartRedux = () => {
+  const dispatch = useDispatch();
+  const { cart, error } = useSelector((state) => state.cart);
+
+  useEffect(() => {
+    dispatch(fetchCart());
+  }, [dispatch]);
+
+  return { cart, error };
+};

@@ -10,6 +10,7 @@ import AppRoutes from "./routes/AppRoutes";
 import LoadingScreen from "./components/common/LoadingScreen";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import NotificationComponent from "./components/notification/Notification";
 
 // Componente interno que maneja la inicializacion
 function AppContent() {
