@@ -12,14 +12,15 @@ import {
   Descriptions,
   message,
 } from "antd";
-import { ShoppingCartOutlined, CreditCardOutlined } from "@ant-design/icons";
+import { CreditCardOutlined } from "@ant-design/icons";
 import { useCheckoutRedux } from "../checkout/useCheckout";
 import { useGetCartRedux } from "./useGetCart";
 import { useNavigate } from "react-router-dom";
 import { useAuthRedux } from "../../../hooks/useAuth";
+import Navbar from "../../common/Navbar";
 
-const { Header, Content } = Layout;
-const { Title, Text } = Typography;
+const { Content } = Layout;
+const { Title } = Typography;
 
 const styles = {
   layout: {
@@ -58,11 +59,7 @@ const CheckoutPage = () => {
 
   return (
     <Layout style={styles.layout}>
-      <Header style={styles.header}>
-        <Title level={3} style={{ color: "white", margin: 0 }}>
-          <ShoppingCartOutlined /> Checkout
-        </Title>
-      </Header>
+      <Navbar shouldShowCart={false} />
 
       <Content style={{ padding: "40px 20px" }}>
         <Row gutter={[24, 24]} justify="center">
@@ -79,7 +76,7 @@ const CheckoutPage = () => {
                 <p>No hay poroductos</p>
               )}
               <div style={{ textAlign: "right" }}>
-                <Title level={4}>Total: ${cart ? cart.total : 0}</Title>
+                <Title level={4}>Total: ${cart && cart.total ? cart.total.toFixed(2) : "0.00"}</Title>
               </div>
             </Card>
           </Col>
