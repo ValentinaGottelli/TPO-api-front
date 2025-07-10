@@ -1,0 +1,365 @@
+.payment-layout {
+    min-height: 100vh;
+    background: #f0f2f5;
+}
+
+.payment-header {
+    background: #1890ff;
+    padding: 0 20px;
+}
+
+.payment-header-content {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.payment-header-button {
+    color: white;
+}
+
+.payment-header-title {
+    color: white;
+    margin: 0;
+}
+
+.payment-content {
+    padding: 40px 20px;
+}
+
+.payment-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Clase para tarjetas - mantener para compatibilidad con componentes hijos */
+.payment-card {
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+/* Estilos para el componente CreditCard */
+.credit-card-container {
+    width: 100%;
+    height: 200px;
+    perspective: 1000px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.credit-card-wrapper {
+    width: 320px;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.6s;
+}
+
+.credit-card-wrapper.flipped {
+    transform: rotateY(180deg);
+}
+
+.credit-card-front,
+.credit-card-back {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    padding: 20px;
+    color: white;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    backface-visibility: hidden;
+}
+
+.credit-card-back {
+    transform: rotateY(180deg);
+}
+
+.credit-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.credit-card-type {
+    font-size: 14px;
+    font-weight: bold;
+    opacity: 0.9;
+}
+
+.credit-card-chip {
+    width: 40px;
+    height: 25px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+}
+
+.credit-card-number {
+    font-size: 20px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-family: monospace;
+}
+
+.credit-card-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.credit-card-holder,
+.credit-card-expiry {
+    font-size: 10px;
+    opacity: 0.7;
+}
+
+.credit-card-holder-name,
+.credit-card-expiry-date {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.credit-card-magnetic-strip {
+    width: 100%;
+    height: 40px;
+    background: linear-gradient(90deg, #2c2c2c, #1a1a1a);
+    margin-top: 10px;
+    border-radius: 4px;
+}
+
+.credit-card-cvv-area {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.credit-card-cvv-box {
+    background: white;
+    color: black;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-family: monospace;
+    min-width: 60px;
+    text-align: center;
+}
+
+.credit-card-back-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-top: 20px;
+}
+
+.credit-card-partial-number {
+    font-size: 12px;
+    opacity: 0.8;
+    font-family: monospace;
+}
+
+.credit-card-signature {
+    font-size: 10px;
+    opacity: 0.7;
+    font-style: italic;
+}
+
+.credit-card-form-row {
+    display: flex;
+    gap: 16px;
+}
+
+/* Estilos para el componente CashMethod */
+.cash-method-container {
+    padding: 20px;
+    background-color: #f6ffed;
+    border: 1px solid #b7eb8f;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.cash-method-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.cash-method-icon {
+    font-size: 24px;
+    color: #52c41a;
+}
+
+.cash-method-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.cash-method-content {
+    color: #666;
+    line-height: 1.5;
+}
+
+.cash-method-item {
+    margin: 0;
+    margin-bottom: 8px;
+}
+
+.cash-method-item:last-child {
+    margin-bottom: 0;
+}
+
+/* Estilos para el componente PaymentMethod */
+.payment-method-container {
+    width: 100%;
+    gap: 12px;
+}
+
+.payment-method-option {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    background-color: #f9f9f9;
+    border: 1px solid #d9d9d9;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.payment-method-option.selected {
+    background-color: #f6ffed;
+    border: 2px solid #1890ff;
+}
+
+.payment-method-option:hover {
+    background-color: #f0f0f0;
+}
+
+.payment-method-option.selected:hover {
+    background-color: #f6ffed;
+}
+
+.payment-method-icon-credit {
+    font-size: 20px;
+    color: #1890ff;
+}
+
+.payment-method-icon-cash {
+    font-size: 20px;
+    color: #52c41a;
+}
+
+.payment-method-title {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.payment-method-subtitle {
+    color: #666;
+    font-size: 12px;
+}
+
+/* Estilos para el componente ShippingAddress */
+.shipping-address-row {
+    display: flex;
+    gap: 16px;
+}
+
+.shipping-address-item {
+    flex: 1;
+}
+
+/* Estilos para el componente Summary */
+.summary-title-icon {
+    margin-right: 8px;
+}
+
+.summary-items-container {
+    width: 100%;
+    gap: 12px;
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.summary-item-info {
+    flex: 1;
+}
+
+.summary-item-name {
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.summary-item-details {
+    color: #666;
+    font-size: 12px;
+}
+
+.summary-item-price {
+    font-weight: 600;
+    color: #1890ff;
+}
+
+.summary-divider {
+    margin: 16px 0;
+}
+
+.summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.summary-total-price {
+    color: #52c41a;
+    font-size: 18px;
+}
+
+.summary-empty {
+    text-align: center;
+    color: #666;
+    padding: 20px 0;
+}
+
+.summary-empty-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+    color: #d9d9d9;
+}
+
+/* Estilos para el componente ConfirmButton */
+.confirm-button-container {
+    width: 100%;
+    justify-content: center;
+    gap: 12px;
+}
+
+.confirm-button-form-item {
+    margin-bottom: 0;
+}
+
+
+
+/* Estilos para mensaje de carrito vacío */
+.cart-empty-message {
+    text-align: center;
+    color: #999;
+    font-size: 12px;
+    margin-top: 8px;
+}
