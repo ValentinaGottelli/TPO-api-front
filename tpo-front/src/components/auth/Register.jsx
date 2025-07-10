@@ -42,7 +42,7 @@ const Register = ({ onSwitchToLogin }) => {
     }
   }, [error, clearError]);
 
-  // Redirigir si ya está autenticado
+  // Redirigir si ya esta autenticado
   useEffect(() => {
     if (isAuthenticated) {
       const redirectPath = getRedirectPath();
@@ -56,7 +56,7 @@ const Register = ({ onSwitchToLogin }) => {
       const result = await register(values);
       
       if (result.success) {
-        // Toast de éxito con información del rol
+        // Toast de exito con informacion del rol
         const roleText = values.role === 'VENDEDOR' ? 'vendedor' : 'comprador';
         toast.success(`¡Registro exitoso! Bienvenido como ${roleText} a Marketplace`, {
           position: "top-right",

@@ -49,7 +49,7 @@ export const useAuthRedux = () => {
   const logout = useCallback(async () => {
     try {
       await dispatch(logoutUser()).unwrap();
-      // Redirect después del logout
+      // Redirect despues del logout
       if (typeof window !== 'undefined') {
         window.location.href = '/auth';
       }

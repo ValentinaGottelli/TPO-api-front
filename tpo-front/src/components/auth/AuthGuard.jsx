@@ -21,12 +21,12 @@ const AuthGuard = ({
     return <LoadingScreen />;
   }
 
-  // Si requiere autenticación pero no está autenticado
+  // Si requiere auten pero no está autenticado
   if (requireAuth && !isAuthenticated) {
     return <Navigate to={redirectTo} replace />;
   }
 
-  // Si NO requiere autenticación pero está autenticado (ej: login page)
+  // Si NO requiere autenn pero esta autenticado (ej: login page)
   if (!requireAuth && isAuthenticated) {
     // Redirigir a dashboard según rol
     const getRedirectPath = (userRole) => {
