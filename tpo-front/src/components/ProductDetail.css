@@ -73,3 +73,7 @@
 .add-to-cart-container {
     margin-top: 2rem;
 } 
+
+.product-card-content {
+    height: 80%;
+}

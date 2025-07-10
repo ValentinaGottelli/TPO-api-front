@@ -60,7 +60,7 @@ const ShippingAddress = ({ styles }) => {
                     rules={[{ required: true, message: 'Selecciona tu país' }]}
                     className="shipping-address-item"
                 >
-                    <Input placeholder="País" defaultValue="Argentina" />
+                    <Input placeholder="País" />
                 </Form.Item>
             </div>
         </Card>

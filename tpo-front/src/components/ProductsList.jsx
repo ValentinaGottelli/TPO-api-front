@@ -61,10 +61,7 @@ export const ProductsList = () => {
     setCurrentPage(1); // Reset a la primera página cuando cambia la categoría
   };
 
-  const handleAddCartClick = (e, product) => {
-    e.stopPropagation();
-    addToCart(product);
-  };
+
 
   if (loading) {
     return (
@@ -109,16 +106,41 @@ export const ProductsList = () => {
             <div
               key={product.id}
               className="product-card"
-              onClick={() => handleProductClick(product.id)}
             >
-              <div className="product-image">
-                <img src={product.imageUrl} alt={product.name} />
+              <div className="product-card-content" onClick={() => handleProductClick(product.id)}>
+                <div className="product-image">
+                  <img src={product.imageUrl} alt={product.name} />
+                </div>
+                <h2>{product.name}</h2>
+                <div className="price">${product.price.toFixed(2)}</div>
+                <div className="category">{product.category.name}</div>
+                <div className="quantity">
+                  Stock disponible: {product.quantity}
+                </div>
               </div>
-              <h2>{product.name}</h2>
-              <div className="price">${product.price.toFixed(2)}</div>
-              <div className="category">{product.category.name}</div>
-              <div className="quantity">
-                Stock disponible: {product.quantity}
+
+              <div className="add-to-cart-container">
+                <Button
+                  type="primary"
+                  size="large"
+                  block
+                  onClick={() => addToCart(product)}
+                  style={{
+                    backgroundColor: '#b19cd9',
+                    borderColor: '#b19cd9',
+                    color: 'white'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.backgroundColor = '#a084d1';
+                    e.target.style.borderColor = '#a084d1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.backgroundColor = '#b19cd9';
+                    e.target.style.borderColor = '#b19cd9';
+                  }}
+                >
+                  Agregar al carrito
+                </Button>
               </div>
             </div>
           ))}
