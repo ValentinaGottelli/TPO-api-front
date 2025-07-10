@@ -1,5 +1,6 @@
 import "./Cart.css";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { Layout, Typography, Flex, Space, Button, InputNumber } from "antd";
 import {
   MinusOutlined,
@@ -27,8 +28,17 @@ export const Cart = () => {
     subtractToCart,
     updateCart,
     removeFromCart,
+    loadCart,
   } = useCart();
   const navigate = useNavigate();
+
+  // Protección para asegurar que cart siempre sea un array
+  const safeCart = Array.isArray(cart) ? cart : [];
+
+  // Cargar el carrito al montar el componente
+  useEffect(() => {
+    loadCart();
+  }, [loadCart]);
 
   const handleFinalizarCompraClick = () => {
     navigate("/checkout");
@@ -42,103 +52,106 @@ export const Cart = () => {
       <Navbar shouldShowCart={false} />
 
       <Content style={{ padding: "40px 20px" }}>
-        <div style={{ maxWidth: "1200px", margin: "0 auto" }}>
-          <Title>Mi carrito</Title>
+        <div className="cart-container">
+          <Title className="cart-title">Mi Carrito</Title>
 
-          {cart.length === 0 ? (
-            <>
-              <Title style={{ textAlign: "center" }}>
-                Su carrito está vacio <FrownOutlined />
+          {safeCart.length === 0 ? (
+            <div className="empty-cart">
+              <Title className="empty-cart-title">
+                Su carrito está vacío <FrownOutlined />
               </Title>
-              <Flex justify="center" align="center">
-                <Button onClick={() => handleContinuarComprandoClick()}>
-                  CONTINUAR COMPRANDO
-                </Button>
-              </Flex>
-            </>
+              <Button
+                className="empty-cart-button"
+                onClick={handleContinuarComprandoClick}
+                size="large"
+              >
+                CONTINUAR COMPRANDO
+              </Button>
+            </div>
           ) : (
             <>
-              <Flex gap="middle" vertical>
-                {cart.map((c) => {
-                  return (
-                    <Flex
-                      key={c.id}
-                      justify="space-between"
-                      className="product-container"
-                      style={{ minHeight: "130px" }}
-                    >
-                      <Flex gap="middle">
-                        <Flex>
-                          <div className="cart-image">
-                            <img src={c.imageUrl} alt={c.name} />
-                          </div>
-                        </Flex>
-                        <Flex vertical justify="center">
-                          <h2 style={{ display: "flex" }}>{c.name}</h2>
-                          {c?.description ? (
-                            <h2 style={{ display: "flex" }}>{c.description}</h2>
-                          ) : (
-                            <></>
+              <div className="cart-items-container">
+                {safeCart.map((c) => (
+                  <div key={c.id} className="product-container">
+                    <Flex gap="middle" align="center" justify="space-between">
+                      <Flex gap="middle" align="center">
+                        <div className="cart-image">
+                          <img src={c.imageUrl} alt={c.name} />
+                        </div>
+                        <div className="product-info">
+                          <h2 className="product-name">{c.name}</h2>
+                          {c?.description && (
+                            <p className="product-description">{c.description}</p>
                           )}
-                          <h3 style={{ display: "flex" }}>{c.category.name}</h3>
-                        </Flex>
+                          <span className="product-category">{c.category.name}</span>
+                        </div>
                       </Flex>
-                      <Flex align="center" gap="middle">
-                        <Button
-                          onClick={() => subtractToCart(c)}
-                          icon={<MinusOutlined />}
-                        />
-                        <InputNumber
-                          min={1}
-                          max={c.quantity}
-                          defaultValue={c.cartQuantity}
-                          onChange={(value) => updateCart(c, value)}
-                          value={c.cartQuantity}
-                        />
-                        <Button
-                          onClick={() => addToCart(c)}
-                          icon={<PlusOutlined />}
-                        />
-                        <h3 className="cart-price">
-                          $ {(c.price * c.cartQuantity).toFixed(2)}
-                        </h3>
+
+                      <div className="cart-controls">
+                        <div className="quantity-controls">
+                          <Button
+                            className="quantity-btn"
+                            onClick={() => subtractToCart(c)}
+                            icon={<MinusOutlined />}
+                            size="small"
+                          />
+                          <InputNumber
+                            className="quantity-input"
+                            min={1}
+                            max={c.quantity}
+                            value={c.cartQuantity}
+                            onChange={(value) => updateCart(c, value)}
+                          />
+                          <Button
+                            className="quantity-btn"
+                            onClick={() => addToCart(c)}
+                            icon={<PlusOutlined />}
+                            size="small"
+                          />
+                        </div>
+
+                        <div className="cart-price">
+                          ${(c.price * c.cartQuantity).toFixed(2)}
+                        </div>
 
                         <Button
+                          className="delete-btn"
                           onClick={() => removeFromCart(c)}
                           icon={<DeleteOutlined />}
-                          type="primary"
-                          danger
+                          size="small"
                         />
-                      </Flex>
+                      </div>
                     </Flex>
-                  );
-                })}
-              </Flex>
-              <Flex justify="end" style={{ marginTop: "16px" }}>
-                <Flex
-                  style={{
-                    width: "40%",
-                    backgroundColor: "aqua",
-                    padding: "10px",
-                  }}
-                  vertical
-                  gap="middle"
-                >
-                  <Flex justify="space-between">
+                  </div>
+                ))}
+              </div>
+
+              <div className="cart-summary">
+                <div className="cart-summary-content">
+                  <div className="total-row">
                     <h2 className="total-title">Total</h2>
-                    <h2 className="total-price">$ {totalPrice?.toFixed(2)}</h2>
-                  </Flex>
-                  <Button
-                    onClick={() => handleFinalizarCompraClick()}
-                    type="primary"
-                  >
-                    FINALIZAR COMPRA
-                  </Button>
-                  <Button onClick={() => handleContinuarComprandoClick()}>
-                    CONTINUAR COMPRANDO
-                  </Button>
-                </Flex>
-              </Flex>
+                    <h2 className="total-price">${totalPrice?.toFixed(2)}</h2>
+                  </div>
+
+                  <div className="cart-buttons-row">
+                    <Button
+                      className="continue-shopping-btn"
+                      onClick={handleContinuarComprandoClick}
+                      size="large"
+                    >
+                      CONTINUAR COMPRANDO
+                    </Button>
+
+                    <Button
+                      className="checkout-btn"
+                      onClick={handleFinalizarCompraClick}
+                      size="large"
+                    >
+                      FINALIZAR COMPRA
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </>
           )}
         </div>
