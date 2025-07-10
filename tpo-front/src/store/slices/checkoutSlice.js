@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import checkoutService from '../../services/checkoutService';
 
-export const confirmCheckout = createAsyncThunk(
+export const confirmCheckoutThunk = createAsyncThunk(
   'checkout/confirm',
   async (_, { rejectWithValue }) => {
     try {
@@ -29,16 +29,16 @@ const checkoutSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(confirmCheckout.pending, (state) => {
+      .addCase(confirmCheckoutThunk.pending, (state) => {
         state.loading = true;
         state.error = null;
         state.response = null;
       })
-      .addCase(confirmCheckout.fulfilled, (state, action) => {
+      .addCase(confirmCheckoutThunk.fulfilled, (state, action) => {
         state.loading = false;
         state.response = action.payload;
       })
-      .addCase(confirmCheckout.rejected, (state, action) => {
+      .addCase(confirmCheckoutThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

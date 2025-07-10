@@ -13,8 +13,8 @@ import {
   message,
 } from "antd";
 import { ShoppingCartOutlined, CreditCardOutlined } from "@ant-design/icons";
-import useCheckout from "../checkout/useCheckout";
-import useGetCart from "./useGetCart";
+import useCheckout, { useCheckoutRedux } from "../checkout/useCheckout";
+import { useGetCartRedux } from "./useGetCart";
 import { useNavigate } from "react-router-dom";
 
 const { Header, Content } = Layout;
@@ -37,8 +37,8 @@ const styles = {
 
 const CheckoutPage = () => {
   const { user } = useAuthRedux();
-  const { confirmCheckout, loading, error, response } = useCheckout();
-  const { cart, prodError } = useGetCart();
+  const { confirmCheckout, loading, error, response } = useCheckoutRedux();
+  const { cart, prodError } = useGetCartRedux();
   const navigate = useNavigate();
 
   useEffect(() => {
