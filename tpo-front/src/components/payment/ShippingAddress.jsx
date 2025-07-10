@@ -45,6 +45,7 @@ const ShippingAddress = ({ styles }) => {
                 <Form.Item
                     label="Código postal"
                     name="zipCode"
+                    validateTrigger="onBlur"
                     rules={[
                         { required: true, message: 'Ingresa tu código postal' },
                         { pattern: /^\d{4,5}$/, message: 'Código postal inválido' }
