@@ -13,6 +13,7 @@ import {
   selectCartTotalPrice,
 } from "../store/slices/cartSlice";
 import { useNotification } from "./useNotification";
+import { message } from "antd";
 
 export const useCart = () => {
   const dispatch = useAppDispatch();
@@ -29,7 +30,7 @@ export const useCart = () => {
   }, [dispatch]);
 
   const addToCart = useCallback(
-    (product) => {
+    async (product) => {
       const cartProduct = formatCartItemToAdd(product, 1);
       if (product?.cartQuantity && product.cartQuantity >= product.quantity) {
         toast({
@@ -37,7 +38,16 @@ export const useCart = () => {
         });
         return;
       }
-      dispatch(addItemToCartThunk(cartProduct));
+      try {
+        await dispatch(addItemToCartThunk(cartProduct)).unwrap()
+        toast({
+          message: `Agregaste el producto al carrito correctamente.`,
+        });
+      } catch { 
+        toast({
+          message: `No se pudo agregar el producto al carrito.`,
+        });
+      }
     },
     [dispatch]
   );
@@ -75,9 +85,13 @@ export const useCart = () => {
   );
 
   const removeFromCart = useCallback(
-    (product) => {
-      toast({ message: `El Producto ${product?.name} se ha eliminado.` });
-      dispatch(deleteProductCartThunk(product.id));
+    async (product) => {
+      try {
+        await dispatch(deleteProductCartThunk(product.id)).unwrap();
+        toast({ message: `El Producto ${product?.name} se ha eliminado.` });
+      } catch { 
+        toast({ message: `El Producto ${product?.name} no pudo ser eliminado.` });
+      }
     },
     [dispatch]
   );
