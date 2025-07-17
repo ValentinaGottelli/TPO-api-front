@@ -69,7 +69,6 @@ const authSlice = createSlice({
     },
     updateUser: (state, action) => {
       state.user = action.payload;
-      authService.updateUser(action.payload);
     },
     clearAuth: (state) => {
       state.user = null;

@@ -30,18 +30,27 @@ import { useAuthRedux } from '../../hooks/useAuth';
 import { toast } from 'react-toastify';
 import productService from '../../services/productService';
 import ProductForm from './ProductForm';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchproductListByUser } from '../../store/slices/productsSlice';
 
 const { Header, Content } = Layout;
 const { Title, Text } = Typography;
 
 const SellerDashboard = () => {
+  const dispatch = useDispatch();
   const { user, logout, loading: authLoading } = useAuthRedux();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [showProductForm, setShowProductForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(null);
+  const productList = useSelector(state => state.products.products)
 
+  useEffect(() => {
+    dispatch(fetchproductListByUser(user.id))
+  }, [dispatch])
+
+  console.log(productList)
   useEffect(() => {
     if (user && user.id) {
       loadUserProducts();
@@ -386,7 +395,7 @@ const SellerDashboard = () => {
               </Button>
             }
           >
-            {products.length === 0 && !loading ? (
+            {productList.length === 0 && !loading ? (
               <Empty
                 description="No tienes productos creados"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
@@ -402,7 +411,7 @@ const SellerDashboard = () => {
             ) : (
               <Table
                 columns={columns}
-                dataSource={products}
+                dataSource={productList}
                 rowKey="id"
                 loading={loading}
                 pagination={{

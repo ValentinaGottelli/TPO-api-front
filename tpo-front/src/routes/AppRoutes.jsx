@@ -16,6 +16,8 @@ import Cart from "../components/cart/Cart";
 import CheckoutSuccessPage from "../components/buyer/checkout/SuccessCheckout";
 import CheckoutPage from "../components/buyer/checkout/Checkout";
 import Payment from "../components/payment/Payment";
+import ProductlistTest from "../components/productPruebaTest/ProductlistTest";
+import ProductlistTestRedux from "../components/productPruebaTest/ProductlistTestRedux";
 
 
 function RoleBasedRedirect() {
@@ -74,7 +76,7 @@ function AppRoutes() {
         }
       />
       
-      <Route path="/products" element={<ProductsList />} />
+      <Route path="/products" element={<ProductlistTestRedux />} />
       <Route path="/products/:id" element={<ProductDetail />} />
       
       <Route path="/cart" element={<Cart />} />
